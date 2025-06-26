@@ -39,8 +39,12 @@
 </template>
 
 <script>
+
+
 import { ref } from "vue";
 export default {
+
+
   name: "LoginPanel",
   setup() {
     const isRegister = ref(false);
@@ -49,6 +53,10 @@ export default {
       password: "",
       confirmPassword: "",
     });
+
+
+
+
 
     const toggleMode = () => {
       isRegister.value = !isRegister.value;
@@ -70,9 +78,9 @@ export default {
 
 <style scoped>
 .login-panel {
-  position: absolute;
+  position: relative ;
   left: 0;
-  top: 64px;
+  top:0;
   bottom: 0;
   width: 320px;
   background-color: #1e4d41;
@@ -81,7 +89,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  z-index: 10;
+  z-index: 0;
 }
 
 .input-group {

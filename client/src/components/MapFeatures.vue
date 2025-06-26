@@ -10,7 +10,6 @@
         @input="search"
         @focus="$emit('toggleSearchResults')"
       />
-
       <div class="search-icon">
         <i class="fas fa-search"></i>
       </div>
@@ -37,7 +36,8 @@
           <i @click="removeResult" class="close-icon far fa-times-circle"></i>
           <h1 class="selected-title">{{ selectedResult.text }}</h1>
           <p class="selected-subtext">
-            {{ selectedResult.properties.address }}, {{ selectedResult.city }},
+            {{ selectedResult.properties.address }},
+            {{ selectedResult.city }},
             {{ selectedResult.state }}
           </p>
           <p class="selected-category">
@@ -60,8 +60,6 @@
     </div>
   </div>
 </template>
-
-
 
 <script>
 import { ref } from "vue";
@@ -121,6 +119,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .search-container {
   position: absolute;
@@ -261,7 +260,6 @@ export default {
   0%, 100% {
     opacity: 1;
   }
-
   50% {
     opacity: 0.5;
   }

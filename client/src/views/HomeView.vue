@@ -1,18 +1,33 @@
 <template>
   <div class="page-container">
+    <!-- ===== Navbar ===== -->
     <nav class="navbar">
-      <div class="navbar-left">
-        <h1 class="logo">Wakeb Maps</h1>
-      </div>
+      <div class="navbar-left"><h1 class="logo">Wakeb Maps</h1></div>
+
       <div class="navbar-right">
         <span v-if="showNavbarSuccess" class="status-message">Success! ✓</span>
-        <button class="logout-button" @click="showLogin = true">
+
+        <!-- Login / Logout toggle -->
+        <button
+          v-if="isLoggedIn"
+          class="logout-button"
+          @click="logout"
+        >
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+        <button
+          v-else
+          class="logout-button"
+          @click="showLogin = true"
+        >
           <i class="fas fa-user"></i> Login
         </button>
       </div>
     </nav>
 
+    <!-- ===== Main content ===== -->
     <div class="content-container" :class="{ 'with-login': showLogin }">
+      <!-- Side Login panel -->
       <LoginPanel
         v-if="showLogin"
         class="login-panel"
@@ -20,10 +35,13 @@
         @success="handleLoginSuccess"
       />
 
+      <!-- Map & overlay -->
       <div class="map-and-overlay">
         <div id="map" class="map">
           <div id="custom-layer-control" class="custom-layer-control"></div>
         </div>
+
+        <!-- Search overlay -->
         <div class="search-overlay">
           <MapFeatures
             @toggleSearchResults="toggleSearchResults"
@@ -38,41 +56,51 @@
       </div>
     </div>
 
-    <GeoErrorModal v-if="geoError" :geoErrorMsg="geoErrorMsg" @closeGeoError="closeGeoError" />
+    <!-- Geolocation error modal -->
+    <GeoErrorModal
+      v-if="geoError"
+      :geoErrorMsg="geoErrorMsg"
+      @closeGeoError="closeGeoError"
+    />
   </div>
 </template>
 
 <script>
-import { ref, onMounted, watch } from "vue";
-import leaflet from "leaflet";
-import GeoErrorModal from "@/components/GeoErrorModal.vue";
-import MapFeatures from "@/components/MapFeatures.vue";
-import LoginPanel from "@/components/LoginPanel.vue";
+import { ref, onMounted, watch } from 'vue';
+import leaflet from 'leaflet';
+import GeoErrorModal from '@/components/GeoErrorModal.vue';
+import MapFeatures from '@/components/MapFeatures.vue';
+import LoginPanel from '@/components/LoginPanel.vue';
 
 export default {
-  name: "HomeView",
+  name: 'HomeView',
   components: { GeoErrorModal, MapFeatures, LoginPanel },
   setup() {
-    const showLogin = ref(false);
+    /* ---------- reactive state ---------- */
+    const showLogin        = ref(false);
     const showNavbarSuccess = ref(false);
-    const coords = ref(null);
-    const fetchCoords = ref(null);
-    const geoMarker = ref(null);
-    const geoError = ref(null);
-    const geoErrorMsg = ref(null);
-    const resultMarker = ref(null);
-    const searchResults = ref(null);
-    let map;
+    const isLoggedIn        = ref(false); // toggles login / logout button
 
+    const coords        = ref(null);
+    const fetchCoords   = ref(null);
+    const geoMarker     = ref(null);
+    const geoError      = ref(null);
+    const geoErrorMsg   = ref(null);
+    const resultMarker  = ref(null);
+    const searchResults = ref(null);
+
+    let map; // Leaflet map instance
+
+    /* ---------- geolocation ---------- */
     const getGeolocation = () => {
-      if (coords.value) {
+      if (coords.value) {                          // clear marker
         coords.value = null;
-        sessionStorage.removeItem("coords");
+        sessionStorage.removeItem('coords');
         map.removeLayer(geoMarker.value);
         return;
       }
-      if (sessionStorage.getItem("coords")) {
-        coords.value = JSON.parse(sessionStorage.getItem("coords"));
+      if (sessionStorage.getItem('coords')) {      // cached
+        coords.value = JSON.parse(sessionStorage.getItem('coords'));
         plotGeolocation(coords.value);
         return;
       }
@@ -83,10 +111,10 @@ export default {
     const setCoords = (pos) => {
       fetchCoords.value = null;
       const setSessionCoords = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
+        lat : pos.coords.latitude,
+        lng : pos.coords.longitude
       };
-      sessionStorage.setItem("coords", JSON.stringify(setSessionCoords));
+      sessionStorage.setItem('coords', JSON.stringify(setSessionCoords));
       coords.value = setSessionCoords;
       plotGeolocation(coords.value);
     };
@@ -98,13 +126,14 @@ export default {
     };
 
     const plotGeolocation = (coords) => {
+      
       const customMarker = leaflet.icon({
-        iconUrl: require("@/assets/map-marker-red.svg"),
-        iconSize: [35, 35],
+        iconUrl : require('@/assets/map-marker-red.svg'),
+        iconSize: [35, 35]
       });
-      geoMarker.value = leaflet.marker([coords.lat, coords.lng], {
-        icon: customMarker,
-      }).addTo(map);
+      geoMarker.value = leaflet
+        .marker([coords.lat, coords.lng], { icon: customMarker })
+        .addTo(map);
       map.setView([coords.lat, coords.lng], 13);
     };
 
@@ -113,16 +142,18 @@ export default {
       geoErrorMsg.value = null;
     };
 
+    /* ---------- search result plotting ---------- */
     const plotResult = (coords) => {
       if (resultMarker.value) map.removeLayer(resultMarker.value);
+
       const customMarker = leaflet.icon({
-        iconUrl: require("@/assets/map-marker-blue.svg"),
-        iconSize: [35, 35],
+        iconUrl : require('@/assets/map-marker-blue.svg'),
+        iconSize: [35, 35]
       });
-      resultMarker.value = leaflet.marker([
-        coords.coordinates[1],
-        coords.coordinates[0],
-      ], { icon: customMarker }).addTo(map);
+      resultMarker.value = leaflet
+        .marker([coords.coordinates[1], coords.coordinates[0]], { icon: customMarker })
+        .addTo(map);
+
       map.setView([coords.coordinates[1], coords.coordinates[0]], 14);
       closeSearchResults();
     };
@@ -130,116 +161,125 @@ export default {
     const toggleSearchResults = () => {
       searchResults.value = !searchResults.value;
     };
+    const closeSearchResults = () => (searchResults.value = null);
+    const removeResult       = () => resultMarker.value && map.removeLayer(resultMarker.value);
 
-    const closeSearchResults = () => {
-      searchResults.value = null;
-    };
-
-    const removeResult = () => {
-      if (resultMarker.value) map.removeLayer(resultMarker.value);
-    };
-
+    /* ---------- auth UI handlers ---------- */
     const handleLoginSuccess = () => {
-      showLogin.value = false;
+      showLogin.value       = false;
       showNavbarSuccess.value = true;
+      isLoggedIn.value      = true;
       setTimeout(() => (showNavbarSuccess.value = false), 4000);
     };
 
+    const logout = () => {
+      isLoggedIn.value = false;
+      sessionStorage.removeItem('coords');
+      coords.value = null;
+      if (geoMarker.value) map.removeLayer(geoMarker.value);
+    };
+
+    /* ---------- Leaflet initialisation ---------- */
     watch(showLogin, () => {
       if (map) {
-        setTimeout(() => {
-          map.invalidateSize();
-        }, 350);
+        setTimeout(() => map.invalidateSize(), 350);
       }
     });
 
     onMounted(() => {
-      map = leaflet.map("map").setView([24.7136, 46.6753], 11);
+const WORLD_BOUNDS = leaflet.latLngBounds([-90, -180], [90, 180]);
+map = leaflet.map('map', {
+  center: [24.7136, 46.6753], 
+  zoom:   11,               
+  minZoom: 5,
+  maxZoom: 16,
+  maxBounds: WORLD_BOUNDS,
+  maxBoundsViscosity: 1.0,      // 1 = صلب، 0.0-0.99 = “مطّاط”
+  inertia: false,               // يوقف الدفع بعد الإفلات
+  worldCopyJump: false             
+});
 
-      const openStreetMap = leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; OpenStreetMap contributors'
-      });
-
-      const esriWorldImagery = leaflet.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        { attribution: "Tiles © Esri" }
+      /* --- base layers --- */
+      const openStreetMap = leaflet.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        { attribution: '&copy; OpenStreetMap contributors' }
       );
 
-      const cartoDBPositron = leaflet.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      const esriImagery = leaflet.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { attribution: 'Tiles © Esri' }
+      );
+
+      const cartoLight = leaflet.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
         { attribution: '&copy; CartoDB' }
       );
 
-      const cartoDBDark = leaflet.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      const cartoDark = leaflet.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
         { attribution: '&copy; CartoDB' }
       );
 
       const openTopo = leaflet.tileLayer(
-        "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-        { attribution: 'Map data: © OpenTopoMap contributors' }
+        'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+        { attribution: 'Map data © OpenTopoMap contributors' }
       );
 
-      const mapboxStreets = leaflet.tileLayer(`
-        https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${process.env.VUE_APP_API_KEY}`,
-        {
-          id: "mapbox/streets-v11",
-          tileSize: 512,
-          zoomOffset: -1,
-          attribution: 'Mapbox © OpenStreetMap'
-        }
-      ).addTo(map);
+      const mapboxStreets = leaflet
+        .tileLayer(
+          `https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${process.env.VUE_APP_API_KEY}`,
+          {
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            attribution: 'Mapbox © OpenStreetMap'
+          }
+        )
+        .addTo(map); // default layer
 
       const baseMaps = {
-        "OpenStreetMap": openStreetMap,
-        "Esri Imagery (Satellite)": esriWorldImagery,
-        "CartoDB Positron": cartoDBPositron,
-        "CartoDB Dark": cartoDBDark,
-        "OpenTopoMap": openTopo,
-        "Mapbox Streets": mapboxStreets
+        OpenStreetMap            : openStreetMap,
+        'Esri Imagery (Satellite)': esriImagery,
+        'CartoDB Positron'       : cartoLight,
+        'CartoDB Dark'           : cartoDark,
+        OpenTopoMap              : openTopo,
+        'Mapbox Streets'         : mapboxStreets
       };
 
-      const layerControl = leaflet.control.layers(baseMaps);
-      layerControl.addTo(map);
+      leaflet.control.layers(baseMaps).addTo(map);
 
-
-
-
-
-
-
-
-
+      /* move control to custom container */
       map.whenReady(() => {
-        const controlContainer = document.querySelector(".leaflet-control-layers");
-        const customContainer = document.getElementById("custom-layer-control");
-        if (controlContainer && customContainer) {
-          customContainer.appendChild(controlContainer);
-        }
+        const ctl = document.querySelector('.leaflet-control-layers');
+        const dest = document.getElementById('custom-layer-control');
+        if (ctl && dest) dest.appendChild(ctl);
       });
 
-      map.on("moveend", closeSearchResults);
-      getGeolocation();
+      map.on('moveend', closeSearchResults);
+      getGeolocation(); // auto-locate on first load (optional)
     });
 
+    /* ---------- exposed to template ---------- */
     return {
       showLogin,
       showNavbarSuccess,
+      isLoggedIn,
+      logout,
       coords,
       fetchCoords,
-      geoMarker,
       geoError,
       geoErrorMsg,
-      closeGeoError,
+      searchResults,
+      /* methods */
       getGeolocation,
       plotResult,
-      searchResults,
       toggleSearchResults,
       closeSearchResults,
       removeResult,
-      handleLoginSuccess,
+      closeGeoError,
+      handleLoginSuccess
     };
-  },
+  }
 };
 </script>
 
@@ -258,8 +298,6 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  font-family: sans-serif;
-  z-index: 700;
 }
 
 .logo {

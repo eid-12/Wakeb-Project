@@ -32,6 +32,7 @@ export default {
   align-items: flex-start;
   padding-top: 125px;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100000;
 }
 
 .geo-modal-content {

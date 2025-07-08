@@ -14,6 +14,10 @@
       <input type="password" placeholder="Password" v-model="form.password" />
     </div>
 
+
+
+
+
     <!-- Confirm Password (for Sign-Up) -->
     <div v-if="isRegister" class="input-group">
       <i class="fas fa-lock"></i>
@@ -183,5 +187,6 @@ async function handleSubmit() {
   font-size: 1.6rem;
   color: white;
   cursor: pointer;
+  
 }
 </style>

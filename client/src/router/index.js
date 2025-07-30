@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+process.env.NODE_NO_WARNINGS = '1';
 
 const routes = [
   {

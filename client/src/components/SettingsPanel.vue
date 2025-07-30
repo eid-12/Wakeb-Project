@@ -1,9 +1,9 @@
-<!-- SettingsPanel.vue -->
 <template>
-  <h1 class="py-10 text-3xl font-bold text-center">Settings</h1>
+  <h1 class="py-10 text-3xl font-bold text-center text-emerald-700">Settings</h1>
 
   <section class="p-6 space-y-8">
     <div class="grid md:grid-cols-2 gap-8 px-10">
+
       <!-- 1) General -->
       <div>
         <h2 class="font-semibold mb-3">General</h2>
@@ -16,24 +16,26 @@
         <label class="block mb-1">Theme</label>
         <div class="space-x-4">
           <label><input type="radio" value="Light" v-model="settings.theme" /> Light</label>
-          <label><input type="radio" value="Dark"  v-model="settings.theme" /> Dark</label>
+          <label><input type="radio" value="Dark"  v-model="settings.theme"  /> Dark</label>
         </div>
       </div>
 
-<!-- 2) Account -->
-<div>
-  <h2 class="font-semibold mb-3">Account</h2>
-  <button class="btn-setting" @click="showPasswordModal = true">
-    <i class="fas fa-key"></i> Change Password
-  </button>
-  <button class="btn-setting" @click="showEmailModal = true">
-    <i class="fas fa-envelope"></i> Change Email
-  </button>
-  <button class="btn-setting-danger" @click="deleteAccount">
-    <i class="fas fa-trash-alt"></i> Delete Account
-  </button>
-</div>
-
+      <!-- 2) Account -->
+      <div>
+        <h2 class="font-semibold mb-3">Account</h2>
+        <button class="btn-setting" @click="showPasswordModal = true">
+          <i class="fas fa-key"></i> Change Password
+        </button>
+        <button class="btn-setting" @click="showEmailModal = true">
+          <i class="fas fa-envelope"></i> Change Email
+        </button>
+        <button class="btn-setting" @click="showUsernameModal = true">
+          <i class="fa-solid fa-user-pen"></i> Change Username
+        </button>
+        <button class="btn-setting-danger" :disabled="deleting" @click="deleteAccount">
+          <i class="fas fa-trash-alt"></i> {{ deleting ? 'Deleting…' : 'Delete Account' }}
+        </button>
+      </div>
 
       <!-- 3) Notifications -->
       <div>
@@ -60,8 +62,8 @@
       <div>
         <h2 class="font-semibold mb-3">Interface</h2>
         <label class="block mb-1">Font Size</label>
-        <label><input type="radio" value="Small"   v-model="settings.fontSize" /> Small</label>
-        <label class="ml-4"><input type="radio" value="Medium"  v-model="settings.fontSize" /> Medium</label>
+        <label><input type="radio" value="Small"  v-model="settings.fontSize" /> Small</label>
+        <label class="ml-4"><input type="radio" value="Medium" v-model="settings.fontSize" /> Medium</label>
       </div>
 
       <!-- 6) Data Settings -->
@@ -80,7 +82,9 @@
     </div>
   </section>
 
-  <!-- ===== Password Modal ===== -->
+  <!-- =================== Modals =================== -->
+
+  <!-- Password Modal -->
   <div v-if="showPasswordModal" class="modal-overlay" @keydown.esc="closePasswordModal" tabindex="0">
     <div class="modal-card">
       <h3 class="text-xl font-semibold mb-4">Change Password</h3>
@@ -96,7 +100,7 @@
     </div>
   </div>
 
-  <!-- ===== Email Modal ===== -->
+  <!-- Email Modal -->
   <div v-if="showEmailModal" class="modal-overlay" @keydown.esc="closeEmailModal" tabindex="0">
     <div class="modal-card">
       <h3 class="text-xl font-semibold mb-4">Change Email</h3>
@@ -110,17 +114,49 @@
       </div>
     </div>
   </div>
+
+  <!-- Username Modal -->
+  <div v-if="showUsernameModal" class="modal-overlay" @click.self="closeUsernameModal" @keydown.esc="closeUsernameModal" tabindex="0">
+    <div class="modal-card">
+      <h3 class="text-xl font-semibold mb-4">Change Username</h3>
+
+      <input v-model.trim="usernameForm.newUsername" type="text" placeholder="New username" class="input" />
+
+      <p v-if="invalidUsername" class="text-red-500 text-sm mt-1">
+        Only letters, numbers, . _ - (3–20 chars)
+      </p>
+
+      <div class="modal-actions mt-4">
+        <button class="btn-cancel"  @click="closeUsernameModal">Cancel</button>
+        <button class="btn-primary"
+                :disabled="savingUsername || invalidUsername || !usernameForm.newUsername.trim()"
+                @click="submitUsername">
+          {{ savingUsername ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script setup>
 /* global defineProps, defineEmits */
 
-import { reactive, ref, watch, onMounted } from 'vue';
+import { reactive, ref, onMounted, computed } from 'vue';
 
-const STORAGE_KEY = 'map-app-settings';
+import {
+  getUser,
+  changeEmail,
+  changeUsername,
+  changePassword,
+  deleteUser,
+  useUser 
+} from '@/api/user';
+import { useAlerts } from '@/composables/useAlerts';
+
+const { showAlert, showConfirm } = useAlerts();
 const emit = defineEmits(['change-menu']);
 
-/* ============ Settings ============ */
 const settings = reactive({
   language: 'English',
   theme: 'Light',
@@ -129,38 +165,54 @@ const settings = reactive({
   fontSize: 'Small',
   autoDeleteHistory: false,
   syncPlaces: false,
-  exportFavorites: false,
+  exportFavorites: false
 });
 
-/* استرجاع/حفظ في localStorage */
-onMounted(() => {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) Object.assign(settings, JSON.parse(saved));
-});
-watch(settings, v => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(v));
-  document.documentElement.classList.toggle('dark', v.theme === 'Dark');
-}, { deep: true, immediate: true });
+const { user, setUser } = useUser();
 
-/* ============ Password Modal ============ */
+onMounted(async () => {
+  const u = await getUser();
+  setUser(u);
+});
+
 const showPasswordModal = ref(false);
 const passwordForm = reactive({ current: '', new: '', confirm: '' });
+const passwordLoading = ref(false);
+
+const mismatch = computed(() =>
+  passwordForm.new.trim() &&
+  passwordForm.confirm.trim() &&
+  passwordForm.new.trim() !== passwordForm.confirm.trim()
+);
 
 function closePasswordModal() {
   showPasswordModal.value = false;
-  Object.assign(passwordForm, { current: '', new: '', confirm: '' });
-}
-function submitPassword() {
-  if (passwordForm.new !== passwordForm.confirm) {
-    alert('Passwords do not match!');
-    return;
-  }
-  // Call API here …
-  alert('Password changed successfully ✔');
-  closePasswordModal();
+  passwordForm.current = '';
+  passwordForm.new = '';
+  passwordForm.confirm = '';
 }
 
-/* ============ Email Modal ============ */
+async function submitPassword() {
+  if (mismatch.value) {
+    showAlert({ type: 'warning', title: 'Warning', message: 'Passwords do not match!' });
+    return;
+  }
+  if (!passwordForm.current || !passwordForm.new || !passwordForm.confirm) {
+  showAlert({ type: 'warning', title: 'Notice', message: 'All fields are required' });
+  return;
+}
+  passwordLoading.value = true;
+  try {
+    await changePassword(passwordForm.current, passwordForm.new, user.value.id);
+    showAlert({ type: 'success', title: 'Success', message: 'Password changed successfully ✔' });
+    closePasswordModal();
+  } catch (e) {
+    showAlert({ type: 'danger', title: 'Error', message: e.response?.data?.message || 'Error changing password' });
+  } finally {
+    passwordLoading.value = false;
+  }
+}
+
 const showEmailModal = ref(false);
 const emailForm = reactive({ newEmail: '', password: '' });
 
@@ -168,30 +220,93 @@ function closeEmailModal() {
   showEmailModal.value = false;
   Object.assign(emailForm, { newEmail: '', password: '' });
 }
-function submitEmail() {
-  if (!emailForm.newEmail.includes('@')) {
-    alert('Invalid email!');
-    return;
-  }
-  // Call API here …
-  alert('Email updated successfully ✔');
-  closeEmailModal();
+
+async function submitEmail() {
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailForm.newEmail)) {
+  showAlert({ type: 'warning', title: 'Notice', message: 'Invalid email format!' });
+  return;
 }
 
-/* ============ Other buttons ============ */
-function deleteAccount() {
-  if (confirm('⚠️ هل أنت متأكد من حذف الحساب نهائيًا؟')) {
-    alert('تم حذف الحساب (تجريبي).');
+  try {
+    await changeEmail(emailForm.newEmail, emailForm.password);
+    showAlert({ type: 'success', title: 'Updated', message: 'Email updated successfully ✔' });
+    closeEmailModal();
+  } catch (e) {
+    showAlert({ type: 'danger', title: 'Error', message: e.response?.data?.message || 'Error updating email' });
   }
 }
+
+const showUsernameModal = ref(false);
+const usernameForm = reactive({ newUsername: '' });
+const savingUsername = ref(false);
+
+const invalidUsername = computed(() =>
+  usernameForm.newUsername.trim() &&
+  !/^[A-Za-z0-9._-]{3,20}$/.test(usernameForm.newUsername.trim())
+);
+
+function closeUsernameModal() {
+  showUsernameModal.value = false;
+  usernameForm.newUsername = '';
+}
+
+async function submitUsername() {
+  if (!usernameForm.newUsername.trim()) {
+    showAlert({ type: 'warning', title: 'Notice', message: 'Please enter a new username' });
+    return;
+  }
+  if (invalidUsername.value) {
+    showAlert({ type: 'warning', title: 'Notice', message: 'Username must be 3-20 characters long and may include . _ - only' });
+    return;
+  }
+  const confirm = await showConfirm({
+    title: 'Confirm Change',
+  message: `Are you sure you want to change the username to "${usernameForm.newUsername}"?`
+
+  });
+  if (!confirm) return;
+
+  savingUsername.value = true;
+  try {
+    await changeUsername(user.value.id, usernameForm.newUsername);
+    showAlert({ type: 'success', title: 'Updated', message: 'Username updated successfully ✔' });
+    closeUsernameModal();
+  } catch (e) {
+    showAlert({ type: 'danger', title: 'Error', message: e.response?.data?.message || 'Error updating username' });
+  } finally {
+    savingUsername.value = false;
+  }
+}
+
+const deleting = ref(false);
+
+async function deleteAccount() {
+  const confirm = await showConfirm({
+    title: 'Confirm Deletion',
+    message: 'Are you sure you want to permanently delete your account? This action cannot be undone.⚠️'
+  });
+  if (!confirm) return;
+  deleting.value = true;
+  try {
+    await deleteUser(user.value.id);
+    showAlert({ type: 'success', title: 'Deleted', message: 'Account deleted successfully' });
+    localStorage.clear();
+    window.location.href = '/';
+  } catch (e) {
+    showAlert({ type: 'danger', title: 'Error', message: e.response?.data?.message || 'An error occurred while deleting the account' });
+  } finally {
+    deleting.value = false;
+  }
+}
+
 function manageSearchData() {
   emit('change-menu', 'history');
 }
 </script>
 
+
 <style scoped>
 /* ============= Tailwind shortcuts ============= */
-/* زرّ عام داخل قائمة الإعدادات */
 .btn-setting {
   @apply w-full flex items-center justify-between border border-emerald-600
          text-emerald-700 dark:text-emerald-300
@@ -199,13 +314,8 @@ function manageSearchData() {
          hover:bg-emerald-50 dark:hover:bg-emerald-900/30
          transition-colors duration-150 ease-in-out;
 }
+.btn-setting i { @apply mr-2; }
 
-/* لإضافة أيقونة صغيرة (اختياري) */
-.btn-setting i {
-  @apply mr-2;
-}
-
-/* زرّ الحذف (خطر) */
 .btn-setting-danger {
   @apply w-full flex items-center justify-between border border-red-600
          text-red-600 dark:text-red-400
@@ -214,7 +324,6 @@ function manageSearchData() {
          transition-colors duration-150 ease-in-out;
 }
 
-/* نافذة منبثقة */
 .modal-overlay {
   @apply fixed inset-0 z-50 bg-black/40 flex items-center justify-center;
 }

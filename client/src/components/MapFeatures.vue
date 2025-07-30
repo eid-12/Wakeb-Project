@@ -1,5 +1,4 @@
 <template>
-
   <div class="search-container">
     <!-- Search Section -->
     <div class="search-box">
@@ -39,9 +38,9 @@
 
         <!-- Selected Result -->
         <div v-if="selectedResult" class="selected-result">
-          <i @click="removeResult" class="close-icon far fa-times-circle"></i>
+          <i @click="removeResults" class="close-icon far fa-times-circle"></i>
           <i @click="$emit('addRoute')" class="route-icon fas fa-route"></i>
-          <h1 class="selectedremoveResult-title">{{ selectedResult.text }}</h1>
+          <h1 class="selected-removeResult-title">{{ selectedResult.text }}</h1>
           <p class="selected-subtext">
             {{ selectedResult.properties.address }},
             {{ selectedResult.city }},
@@ -68,168 +67,116 @@
   </div>
 </template>
 
-<script>
+<script setup>
+/* global defineProps, defineEmits ,defineExpose*/
+
 import { ref, onUnmounted } from "vue";
-import axios from "axios";
 import LoadingSpinner from "./LoadingSpinner.vue";
+import { searchPlace } from '@/api/http.js'; 
 
-export default {
-  name: "MapFeatures",
-  components: { LoadingSpinner },
-  props: {
-    fetchCoords: Boolean,
-    coords: Object,
-    searchResults: Boolean
-  },
-  emits: ["plotResult", "removeResult", "toggleSearchResults", "getGeolocation","addRoute"],
-  setup(props, { emit }) {
-    /* ------------------- state ------------------- */
-    const searchQuery    = ref("");
-    const searchData     = ref(null);
-    const queryTimeout   = ref(null);
-    const selectedResult = ref(null);
-    const history = ref(loadHistory())
+const props = defineProps({
+  fetchCoords: Boolean,
+  coords: Object,
+  searchResults: Boolean
+});
 
+const emit = defineEmits([
+  "plotResult",
+  "removeResult",
+  "toggleSearchResults",
+  "getGeolocation",
+  "addRoute",
+  "saveHistory"
+]);
 
-    /* ---------------- util: Haversine ------------- */
-    /**
-     * احسب المسافة بين نقطتَي إحداثيات (lat, lng) بالكيلومتر.
-     * @param {{lat:number,lng:number}} c1
-     * @param {{lat:number,lng:number}} c2
-     * @returns {number} المسافة كم
-     */
-    function haversineDistance(c1, c2) {
-      const toRad = (v) => (v * Math.PI) / 180;
-      const R = 6371;                          // نصف قُطر الأرض (كم)
-      const dLat = toRad(c2.lat - c1.lat);
-      const dLon = toRad(c2.lng - c1.lng);
-      const lat1 = toRad(c1.lat);
-      const lat2 = toRad(c2.lat);
+const searchQuery    = ref("");
+const searchData     = ref(null);
+const queryTimeout   = ref(null);
+const selectedResult = ref(null);
 
-      const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.sin(dLon / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+function haversineDistance(c1, c2) {
+  const toRad = v => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(c2.lat - c1.lat);
+  const dLon = toRad(c2.lng - c1.lng);
+  const lat1 = toRad(c1.lat);
+  const lat2 = toRad(c2.lat);
 
-      return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLon / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
 
-    /* --------------- search handler --------------- */
-    const search = () => {
-      clearTimeout(queryTimeout.value);
-      searchData.value = null;
-
-      queryTimeout.value = setTimeout(async () => {
-        const q = searchQuery.value.trim();
-        if (!q) {
-          searchData.value = null;
-          return;
-        }
-
-        try {
-          const params = new URLSearchParams({
-            fuzzyMatch: true,
-            language: "en",
-            limit: 10,
-            proximity: props.coords
-              ? `${props.coords.lng},${props.coords.lat}`
-              : "0,0",
-          });
-
-          const { data } = await axios.get(
-            `api/search/${encodeURIComponent(q)}?${params}`
-          );
-
-          let features = data.features || [];
-
-          /* فرز بالمسافة لو الإحداثيات متاحة */
-          if (props.coords) {
-            features = features
-              .map((f) => {
-                f.distance = haversineDistance(
-                  props.coords,
-                  { lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }
-                );
-                return f;
-              })
-              .sort((a, b) => a.distance - b.distance);
-          }
-
-          searchData.value = features;
-                addToHistory(searchQuery.value);
-
-        } catch (err) {
-          console.error("Search error:", err);
-          searchData.value = []; // قائمة فارغة دون تكسير الواجهة
-        }
-      }, 750);
-    };
-
-    /* --------------- result handlers -------------- */
-    const selectResult = (feature) => {
-      selectedResult.value = feature;
-      emit("plotResult", feature.geometry);
-    };
-
-    const removeResult = () => {
-       selectedResult.value = null;
-      emit("removeResult");
-    };
-
-    /* --------------- lifecycle cleanup ------------ */
-    onUnmounted(() => clearTimeout(queryTimeout.value));
-
-
-
-function formatTimestamp (date = new Date()) {
-      return date.toLocaleString('en-US', {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      })
-    }
-
-    function loadHistory () {
-      try {
-        return JSON.parse(localStorage.getItem('searchHistory')) || []
-      } catch (err) {
-        return []
-      }
-    }
-
-    function saveHistory () {
-      localStorage.setItem('searchHistory', JSON.stringify(history.value));
-    }
-
-function addToHistory (query) {
-  history.value.unshift({
-    id: crypto.randomUUID(),          // مفتاح فريد  ✔
-    query,
-    timestamp: formatTimestamp()
-  });
-  history.value = history.value.slice(0, 50);
-  saveHistory();
-  emit('updateHistory', [...history.value]);
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+const search = () => {
+  clearTimeout(queryTimeout.value);
+  searchData.value = null;
+
+  queryTimeout.value = setTimeout(async () => {
+    const q = searchQuery.value.trim();
+    if (!q) {
+      searchData.value = null;
+      return;
+    }
+
+    try {
+
+const data = await searchPlace(q, {
+  fuzzyMatch: true,
+  language: "en",
+  limit: 10,
+  proximity: props.coords
+    ? `${props.coords.lng},${props.coords.lat}`
+    : "0,0",
+});
 
 
-    /* --------------- expose to template ----------- */
-    return {
-      searchQuery,
-      searchData,
-      selectedResult,
-      search,
-      selectResult,
-      removeResult,
-      history
-    };
-  },
+      let features = data.features || [];
+
+      if (props.coords) {
+        features = features
+          .map(f => {
+            f.distance = haversineDistance(
+              props.coords,
+              { lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }
+            );
+            return f;
+          })
+          .sort((a, b) => a.distance - b.distance);
+      }
+
+      searchData.value = features;
+
+      emit("saveHistory", q);
+
+    } catch (err) {
+      console.error("Search error:", err);
+      searchData.value = [];
+    }
+  }, 750);
 };
 
+const selectResult = feature => {
+  selectedResult.value = feature;
+    emit("removeResult");
+  emit("plotResult", feature.geometry);
+};
+
+const removeResults = () => {
+  selectedResult.value = null;
+  emit("removeResult");
+  searchQuery.value = null ;
+
+};
+
+onUnmounted(() => clearTimeout(queryTimeout.value));
+defineExpose({
+  removeResults
+})
 </script>
+
+
 
 
 

@@ -47,76 +47,125 @@
 </template>
 
 <script setup>
-/* global defineEmits */  
+/* global defineEmits defineExpose */  
 import { ref } from 'vue';
-import axios from 'axios';
-// eslint-disable-next-line no-undef
-const emit = defineEmits(['close', 'success']);          // events to parent
-const API_URL = 'http://localhost:3001/users';           // JSON-Server endpoint
+import { useAlerts } from '@/composables/useAlerts';
+import { registerUser, loginUser, getUser, useUser } from '@/api/user'
 
-/* reactive state */
+const { showAlert, showConfirm } = useAlerts();
+const { setUser, clearUser } = useUser();
+
+const emit = defineEmits(['close', 'success']);
+
 const isRegister = ref(false);
-const form = ref({ username: '', password: '', confirmPassword: '' });
+const form = ref({
+  username: '',
+  password: '',
+  confirmPassword: '',
+});
 
-const resetForm = () =>
-  (form.value = { username: '', password: '', confirmPassword: '' });
+const resetForm = () => {
+  form.value = {
+    username: '',
+    password: '',
+    confirmPassword: '',
+  };
+};
 
 function toggleMode() {
   isRegister.value = !isRegister.value;
   resetForm();
 }
+ function logoutUser() {
+  clearUser();
+  localStorage.removeItem('savedPlaces');
+  sessionStorage.removeItem('coords');
+}
+function isValidPassword(password) {
+  const minLength = 6;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  return (
+    password.length >= minLength &&
+    hasUppercase &&
+    hasLowercase &&
+    hasNumber
+  );
+}
+
+
+function isValidUsername(username) {
+  const minLength = 3;
+  const validPattern = /^[a-zA-Z0-9_-]+$/; 
+  const startsOrEndsWithDash = /^[-_]|[-_]$/.test(username); 
+
+  return (
+    username.length >= minLength &&
+    validPattern.test(username) &&
+    !startsOrEndsWithDash
+  );
+}
 
 async function handleSubmit() {
-  if (!form.value.username || !form.value.password) {
-    alert('Please fill in all required fields.');
+  const { username, password, confirmPassword } = form.value;
+
+  if (!username || !password) {
+    showAlert({ type: 'warning', title: 'Missing Fields', message: 'Please fill in all required fields.' });
     return;
   }
 
+
   if (isRegister.value) {
-    /* ---------- Sign-Up flow ---------- */
-    if (form.value.password !== form.value.confirmPassword) {
-      alert('Passwords do not match.');
+    if (password !== confirmPassword) {
+      showAlert({ type: 'warning', title: 'Mismatch', message: 'Passwords do not match.' });
       return;
     }
-    try {
-      const exists = await axios.get(
-        `${API_URL}?username=${encodeURIComponent(form.value.username)}`
-      );
-      if (exists.data.length) {
-        alert('Username already taken.');
-        return;
-      }
-      await axios.post(API_URL, {
-        username: form.value.username,
-        password: form.value.password,
+    if (!isValidPassword(password)) {
+      showAlert({
+        type: 'warning',
+        title: 'Weak Password',
+        message: 'Password must be at least 6 characters and contain uppercase, lowercase letters, and a number.'
       });
-      alert('Account created! Please sign in.');
-      toggleMode(); // switch to Sign-In
+      return;
+    }
+    if (!isValidUsername(username)) {
+    showAlert({
+      type: 'warning',
+      title: 'Invalid Username',
+      message: 'Username must be at least 3 characters and contain only letters, numbers, hyphens (-), or underscores (_). It cannot start or end with - or _.'
+    });
+    return;
+    }
+    try {
+      await registerUser({ username, password });
+      showAlert({ type: 'success', title: 'Account Created', message: 'Account created! Please sign in.' });
+      emit('success');
     } catch (err) {
-      console.error(err);
-      alert('Registration failed. Please try again.');
+      const msg = err.response?.data || 'Registration failed. Please try again.';
+      showAlert({ type: 'danger', title: 'Registration Error', message: msg });
     }
   } else {
-    /* ---------- Sign-In flow ---------- */
     try {
-      const res = await axios.get(
-        `${API_URL}?username=${encodeURIComponent(
-          form.value.username
-        )}&password=${encodeURIComponent(form.value.password)}`
-      );
-      if (res.data.length) {
-        emit('success'); // notify parent
-        resetForm();
-      } else {
-        alert('Invalid username or password.');
-      }
+      await loginUser( { username, password });
+      const u = await getUser();
+      setUser(u);
+
+      showAlert({ type: 'success', title: 'Login Successful', message: 'Welcome!' });
+      emit('success');
+      resetForm();
     } catch (err) {
-      console.error(err);
-      alert('Login failed. Please try again.');
+      const msg = 'Invalid username or password.';
+      showAlert({ type: 'danger', title: 'Login Failed', message: msg });
     }
   }
 }
+defineExpose({
+  logoutUser
+})
 </script>
+
+
 
 <style scoped>
 .login-panel {

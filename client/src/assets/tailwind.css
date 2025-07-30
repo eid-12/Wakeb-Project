@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.swal2-cancel {
+  background-color: #6b7280 !important; /* لون الخلفية */
+  color: white !important;              /* لون النص */
+  border: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.swal-custom-btn {
+  background-color: #10b981 !important; /* لون الزر */
+  color: white !important;              /* لون النص */
+  border: none !important;
+  box-shadow: none !important;
+}

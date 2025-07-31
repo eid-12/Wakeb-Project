@@ -8,7 +8,7 @@ pipeline{
         {
           steps  {
                 echo 'Cloning the Repo'
-                git branch: 'main', url: 'https://github.com/Erik-rosol/CICD_training.git'
+                git branch: 'main', url: 'https://github.com/eid-12/Wakeb-Project.git'
             }
           }
         stage('Build')

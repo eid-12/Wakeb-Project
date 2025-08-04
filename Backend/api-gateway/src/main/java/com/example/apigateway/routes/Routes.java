@@ -21,7 +21,7 @@ public class Routes {
     public RouterFunction<ServerResponse> userServiceRoute() {
         return GatewayRouterFunctions.route("User-Service")
                 .route(RequestPredicates.path("/api/user/**"), http())
-                .before(uri("http://localhost:9000")) // Forward to user-service
+                .before(uri("user-service.railway.internal")) // Forward to user-service
                 .build();
     }
 
@@ -29,7 +29,7 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> userServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("User-Service_Swagger")
-                .route(RequestPredicates.path("/aggregate/user/v3/api-docs"), HandlerFunctions.http("http://localhost:9000"))
+                .route(RequestPredicates.path("/aggregate/user/v3/api-docs"), HandlerFunctions.http("user-service.railway.internal"))
                 .filter(setPath("/v3/api-docs")) // Rewrite path before forwarding
                 .build();
     }
@@ -39,7 +39,7 @@ public class Routes {
     public RouterFunction<ServerResponse> placeServiceRoute() {
         return GatewayRouterFunctions.route("Place-Service")
                 .route(RequestPredicates.path("/api/place/**"), http())
-                .before(uri("http://localhost:9001"))
+                .before(uri("place-service.railway.internal"))
                 .build();
     }
 
@@ -47,7 +47,7 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> placeServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("Place-Service_Swagger")
-                .route(RequestPredicates.path("/aggregate/place/v3/api-docs"), HandlerFunctions.http("http://localhost:9001"))
+                .route(RequestPredicates.path("/aggregate/place/v3/api-docs"), HandlerFunctions.http("place-service.railway.internal"))
                 .filter(setPath("/v3/api-docs"))
                 .build();
     }
@@ -57,7 +57,7 @@ public class Routes {
     public RouterFunction<ServerResponse> searchPlaceServiceRoute() {
         return GatewayRouterFunctions.route("Search-Service")
                 .route(RequestPredicates.path("/api/search/**"), http())
-                .before(uri("http://localhost:9002"))
+                .before(uri("search-service.railway.internal"))
                 .build();
     }
 
@@ -65,7 +65,7 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> searchPlaceServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("Search-Service_Swagger")
-                .route(RequestPredicates.path("/aggregate/search/v3/api-docs"), HandlerFunctions.http("http://localhost:9002"))
+                .route(RequestPredicates.path("/aggregate/search/v3/api-docs"), HandlerFunctions.http("search-service.railway.internal"))
                 .filter(setPath("/v3/api-docs"))
                 .build();
     }
@@ -75,7 +75,7 @@ public class Routes {
     public RouterFunction<ServerResponse> savedPlaceServiceRoute() {
         return GatewayRouterFunctions.route("SavedPlace-Service")
                 .route(RequestPredicates.path("/api/saved/**"), http())
-                .before(uri("http://localhost:9003"))
+                .before(uri("SavedPlace-Service.railway.internal"))
                 .build();
     }
 
@@ -83,7 +83,7 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> savedPlaceServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("SavedPlace-Service_Swagger")
-                .route(RequestPredicates.path("/aggregate/saved/v3/api-docs"), HandlerFunctions.http("http://localhost:9003"))
+                .route(RequestPredicates.path("/aggregate/saved/v3/api-docs"), HandlerFunctions.http("SavedPlace-Service.railway.internal"))
                 .filter(setPath("/v3/api-docs"))
                 .build();
     }

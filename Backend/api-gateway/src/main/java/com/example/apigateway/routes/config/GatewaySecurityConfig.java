@@ -36,7 +36,8 @@ public class GatewaySecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // Enable CORS using a custom configuration
-                .cors(withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
 
                 // Add JWT relay filter before the default UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtRelayFilter, UsernamePasswordAuthenticationFilter.class)
@@ -70,6 +71,7 @@ public class GatewaySecurityConfig {
 
         config.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
         config.setAllowedMethods(Arrays.asList("GET", "PATCH", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods
+        config.setExposedHeaders(List.of("Set-Cookie"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config); // Apply to all routes

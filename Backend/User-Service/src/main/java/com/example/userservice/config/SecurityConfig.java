@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 public class SecurityConfig {
 
@@ -20,7 +22,7 @@ public class SecurityConfig {
     SecurityFilterChain filter(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF protection (optional for APIs)
-                .cors(Customizer.withDefaults()) // Enable CORS
+                .cors(withDefaults()) // Enable CORS
                 .authorizeHttpRequests(auth -> auth
                         // Allow all OPTIONS requests (for CORS preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

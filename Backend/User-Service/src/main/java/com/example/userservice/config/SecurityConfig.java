@@ -25,7 +25,7 @@ public class SecurityConfig {
                 .cors(withDefaults()) // Enable CORS
                 .authorizeHttpRequests(auth -> auth
                         // Allow all OPTIONS requests (for CORS preflight)
-                        .requestMatchers(HttpMethod.OPTIONS, "/api/user/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/api/user/**" , "/api/auth/**").permitAll()
                         // Allow public access to Swagger docs and selected APIs
                         .requestMatchers(
                                 "/v3/api-docs/**",

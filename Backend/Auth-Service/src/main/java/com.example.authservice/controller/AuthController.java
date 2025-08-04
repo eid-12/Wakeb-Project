@@ -32,7 +32,7 @@ public class AuthController {
 
         // Create a secure HTTP-only cookie to store the token
         ResponseCookie cookie = ResponseCookie.from("token", token)
-                .httpOnly(true)
+                .httpOnly(false)
                 .path("/")
                 .maxAge(60 * 60 * 2) // Token valid for 2 hours
                 .secure(false)// Change to true in production

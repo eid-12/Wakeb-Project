@@ -47,7 +47,7 @@ public class GatewaySecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
 
                         // Require authentication for any /api/place/** endpoint
-                        .requestMatchers("/api/place/**").authenticated()
+                        .requestMatchers("/api/place/** ", "/api/user/**"  ).authenticated()
 
                         // All other requests must be authenticated
                         .anyRequest().authenticated()

@@ -33,10 +33,11 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/api/auth/**",
                                 "/error",
-                                "/api/user/**"
+                                "/api/user/**" ,
+
                         ).permitAll()
                         // All other requests require authentication
-                        
+
 
                         .anyRequest().authenticated()
                 )

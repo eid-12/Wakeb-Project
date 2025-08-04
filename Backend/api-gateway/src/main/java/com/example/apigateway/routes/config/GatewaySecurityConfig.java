@@ -14,7 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @AllArgsConstructor // Lombok: generates constructor for required fields
 @Configuration // Marks this class as a Spring configuration
@@ -33,7 +36,7 @@ public class GatewaySecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // Enable CORS using a custom configuration
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(withDefaults())
 
                 // Add JWT relay filter before the default UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtRelayFilter, UsernamePasswordAuthenticationFilter.class)
@@ -65,8 +68,8 @@ public class GatewaySecurityConfig {
         // Allow requests from any localhost port (e.g., Vue/React running on :5173, :8080, etc.)
         config.setAllowedOrigins(List.of("http://localhost:8080", "http://192.168.110.211:8080"));
 
-        config.setAllowedHeaders(List.of("*")); // Allow all headers
-        config.setAllowedMethods(List.of("GET", "PATCH", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods
+        config.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
+        config.setAllowedMethods(Arrays.asList("GET", "PATCH", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config); // Apply to all routes

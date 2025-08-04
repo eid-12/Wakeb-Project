@@ -24,7 +24,7 @@ public class CorsConfig implements WebMvcConfigurer {
         config.setAllowCredentials(true);
 
         // Allow requests from this frontend origin (adjust as needed)
-        config.setAllowedOriginPatterns(List.of("http://localhost:8080"));
+        config.setAllowedOriginPatterns(List.of("http://192.168.110.211:8080"));
 
         // Allow these HTTP methods
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

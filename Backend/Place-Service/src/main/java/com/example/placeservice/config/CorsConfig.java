@@ -20,7 +20,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true); // Allow cookies and authorization headers
-        config.setAllowedOriginPatterns(List.of("http://localhost:8080")); // Allow requests from frontend
+        config.setAllowedOriginPatterns(List.of("http://192.168.110.211:8080")); // Allow requests from frontend
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // Allowed HTTP methods
         config.setAllowedHeaders(List.of("*")); // Allow all headers
         config.setMaxAge(3600L); // Cache the preflight response for 1 hour

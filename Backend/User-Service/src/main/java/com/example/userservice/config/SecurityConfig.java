@@ -32,10 +32,11 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/api/auth/**",
-                                "/error"
+                                "/error",
+                                "/api/user/**"
                         ).permitAll()
                         // All other requests require authentication
-                        .requestMatchers("/api/user/**").authenticated()
+                        
 
                         .anyRequest().authenticated()
                 )

@@ -38,12 +38,12 @@ public class AuthService {
         userRepo.save(user);
 
         // Inform the user-service via Feign client
-        userClient.createUser(
-                new UserCreateRequest(
-                        user.getId(),
-                        user.getUsername()
-                )
-        );
+//        userClient.createUser(
+//                new UserCreateRequest(
+//                        user.getId(),
+//                        user.getUsername()
+//                )
+//        );
 
         // Return JWT token as AuthResponse
         return new AuthResponse(jwtService.generateToken(user));

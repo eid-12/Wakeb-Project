@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public interface UserClient {
 
     // Sends a POST request to create a new user
-    @PostMapping("/api/user/creat")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/user/creat")
     void createUser(@RequestBody UserCreateRequest userCreateRequest);
 
     // Sends a PUT request to update the username of a user by ID

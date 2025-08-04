@@ -21,7 +21,7 @@ public class Routes {
     public RouterFunction<ServerResponse> userServiceRoute() {
         return GatewayRouterFunctions.route("User-Service")
                 .route(RequestPredicates.path("/api/user/**"), http())
-                .before(uri("user-service.railway.internal")) // Forward to user-service
+                .before(uri("https://user-service-production-2e52.up.railway.app")) // Forward to user-service
                 .build();
     }
 
@@ -29,7 +29,7 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> userServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("User-Service_Swagger")
-                .route(RequestPredicates.path("/aggregate/user/v3/api-docs"), HandlerFunctions.http("user-service.railway.internal"))
+                .route(RequestPredicates.path("/aggregate/user/v3/api-docs"), HandlerFunctions.http("https://user-service-production-2e52.up.railway.app"))
                 .filter(setPath("/v3/api-docs")) // Rewrite path before forwarding
                 .build();
     }

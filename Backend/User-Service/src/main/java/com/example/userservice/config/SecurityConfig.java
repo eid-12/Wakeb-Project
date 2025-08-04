@@ -32,10 +32,11 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/api/auth/**",
-                                "/error",
-                                "/api/user/**"
+                                "/error"
                         ).permitAll()
                         // All other requests require authentication
+                        .requestMatchers("/api/user/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
                 .build(); // Build the security filter chain

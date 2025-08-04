@@ -10,6 +10,8 @@ import java.sql.Timestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "USER")
+
 public class User {
 
     // Primary key (ID) of the user

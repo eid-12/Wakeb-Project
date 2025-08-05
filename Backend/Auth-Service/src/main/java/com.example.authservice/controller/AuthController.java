@@ -8,6 +8,7 @@ import com.example.authservice.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,10 @@ public class AuthController {
                 .domain("auth-service-production-cd9b.up.railway.app")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+//        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(201)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
     }
 
     // Login a user and return a token as an HTTP-only cookie

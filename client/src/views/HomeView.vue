@@ -146,7 +146,7 @@ const savedPlaces = ref(JSON.parse(localStorage.getItem('savedPlaces') || '[]'))
 const latestQuery = ref("");
 const showWelcome = ref(true)
 /* Titles could still be useful somewhere else */
-const { user, setUser } = useUser();
+const { user, setUser , clearUser } = useUser();
 const { showAlert} = useAlerts();
 const loginPanelRef = ref(null)
 const removeResultsRef = ref(null)
@@ -297,6 +297,7 @@ function closeGeoError() {
 }
 
 async function handleLoginSuccess() {
+   clearUser();
   showLogin.value = false;
   showNavbarSuccess.value = true;
   isLoggedIn.value = true;
@@ -307,6 +308,7 @@ setTimeout(() => { showNavbarSuccess.value = false }, 4000);
 }
 
 function logout() {
+  clearUser();
   loginPanelRef.value?.logoutUser?.()
 removeResultsRef.value?.removeResults?.()
 

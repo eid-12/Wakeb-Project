@@ -35,8 +35,8 @@ public class AuthController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(60 * 60 * 2) // Token valid for 2 hours
-                .secure(true)// Change to true in production
-                .sameSite("None")
+                .secure(false)// Change to true in production
+                .sameSite("Strict")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -52,7 +52,7 @@ public class AuthController {
                 .path("/")
                 .maxAge(60 * 60 * 2)
                 .secure(false)// Change to true in production
-                .sameSite("None")
+                .sameSite("Strict")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());

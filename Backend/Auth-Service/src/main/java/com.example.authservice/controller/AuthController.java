@@ -43,7 +43,6 @@ public class AuthController {
                 .maxAge(60 * 60 * 2) // Token valid for 2 hours
                 .secure(true)// Change to true in production
                 .sameSite("None")
-                .domain("up.railway.app")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
         return ResponseEntity.status(HttpStatus.CREATED).build();

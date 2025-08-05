@@ -34,8 +34,8 @@ public class AuthController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(60 * 60 * 2) // Token valid for 2 hours
-                .secure(false)// Change to true in production
-                .sameSite("Strict")
+                .secure(true)// Change to true in production
+                .sameSite("None")
                 .domain("up.railway.app")
                 .domain("auth-service-production-cd9b.up.railway.app")
                 .build();

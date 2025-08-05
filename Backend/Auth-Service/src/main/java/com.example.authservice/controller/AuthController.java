@@ -32,11 +32,11 @@ public class AuthController {
 
         // Create a secure HTTP-only cookie to store the token
         ResponseCookie cookie = ResponseCookie.from("token", token)
-                .httpOnly(false)
+                .httpOnly(true)
                 .path("/")
                 .maxAge(60 * 60 * 2) // Token valid for 2 hours
-                .secure(false)// Change to true in production
-                .sameSite("Lax")
+                .secure(true)// Change to true in production
+                .sameSite("None")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
         return ResponseEntity.status(HttpStatus.CREATED).build();

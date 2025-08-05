@@ -5,7 +5,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build   # ينتج /app/dist
+RUN node -v && npm -v && pwd && ls -la && ls -la public || true
+RUN test -f public/index.html || (echo "❌ public/index.html missing" && exit 1)
+RUN npm run build --verbose
 
 FROM node:18-bullseye
 WORKDIR /app
@@ -15,4 +17,4 @@ COPY server.js ./server.js
 COPY --from=build /app/dist ./dist
 ENV NODE_ENV=production
 EXPOSE 8080
-CMD ["node", "server.js"]
+CMD ["node","server.js"]

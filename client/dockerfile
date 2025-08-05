@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1.4
+
+# ===== BUILD =====
+FROM node:18-bullseye AS build   # Node 18 أكثر توافقًا مع Vue CLI 5
+WORKDIR /app/client
+
+COPY client/package*.json ./
+RUN npm ci
+
+COPY client/ .
+
+# فحص مبكر: تأكد أن public/index.html موجود
+RUN test -f public/index.html || (echo "❌ public/index.html is missing" && ls -la && exit 1)
+
+# معلومات تشخيصية مفيدة
+RUN node -v && npm -v && ls -la && ls -la public && cat vue.config.js
+
+RUN npm run build   # ينتج /app/client/dist
+
+# ===== RUNTIME =====
+FROM node:18-bullseye
+WORKDIR /app/client
+
+COPY client/package*.json ./
+RUN npm ci --omit=dev
+
+COPY client/server.js ./server.js
+COPY --from=build /app/client/dist ./dist
+
+ENV NODE_ENV=production
+EXPOSE 8080
+CMD ["node", "server.js"]

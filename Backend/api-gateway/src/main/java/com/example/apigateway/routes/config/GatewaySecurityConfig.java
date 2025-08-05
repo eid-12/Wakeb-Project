@@ -67,7 +67,7 @@ public class GatewaySecurityConfig {
         config.setAllowCredentials(true); // Allow cookies and authorization headers
 
         // Allow requests from any localhost port (e.g., Vue/React running on :5173, :8080, etc.)
-        config.setAllowedOrigins(List.of("http://localhost:8080", "http://192.168.110.211:8080" ,"maps.up.railway.app"));
+        config.setAllowedOrigins(List.of("http://localhost:8080", "http://192.168.110.211:8080" ,"https://maps.up.railway.app"));
 
         config.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
         config.setAllowedMethods(Arrays.asList("GET", "PATCH", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods

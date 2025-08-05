@@ -48,11 +48,11 @@ public class AuthController {
         String token = authService.login(request).token(); // Get only the token
 
         ResponseCookie cookie = ResponseCookie.from("token", token)
-                .httpOnly(true)
-                .secure(true)
+                .httpOnly(false)
                 .path("/")
                 .maxAge(60 * 60 * 2)
-                .sameSite("Strict")
+                .secure(false)// Change to true in production
+                .sameSite("Lax")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());

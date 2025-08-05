@@ -14,7 +14,7 @@
           </button>
 
         <button v-if="isLoggedIn" class="logout-button" @click="logout">
-          <i class="fas fa-sign-out-alt"></i> Logout
+          <i class="fas fa-sign-out-alt" id="Logout"></i> Logout
         </button>
         <button v-else class="logout-button" @click="showLogin = true">
           <i class="fas fa-user"></i> Login
@@ -514,8 +514,7 @@ const content = `
 .status-message { font-size: 0.9rem; color: #d1fae5; }
 .logout-button { background: none; border: none; color: inherit; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 0.25rem; }
 .logout-button i { font-size: 1rem; }
-.logout-button:hover { color: #e53935; }
-
+#Logout:hover { color: #e53935; }
 .content-container { display: flex; flex-direction: row; height: calc(100vh - 64px); }
 .login-panel { width: 320px; height: 100%; background: #1e4d41; color: white; z-index: 600; transition: all 0.3s ease; }
 .side-dashboard { width: 220px; background-color: #083c35; color: #fff; padding: 1rem; }

@@ -30,22 +30,19 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request, HttpServletResponse response) {
         String token = authService.register(request).token();
-//        response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from("token","")
-//                .path("/")
-//                .sameSite("None")
-//                .secure(true)
-//                .maxAge(0)               // delete
-//                .build().toString());
+
         // Create a secure HTTP-only cookie to store the token
         ResponseCookie cookie = ResponseCookie.from("token", token)
                 .httpOnly(true)
                 .path("/")
-                .maxAge(60 * 60 * 2) // Token valid for 2 hours
-                .secure(true)// Change to true in production
-                .sameSite("None")
+                .maxAge(60 * 60 * 2)
+                .secure(false)// Change to true in production
+                .sameSite("Strict")
+                .domain("up.railway.app")
                 .build();
+
         response.addHeader("Set-Cookie", cookie.toString());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.ok().build();
     }
 
     // Login a user and return a token as an HTTP-only cookie

@@ -37,6 +37,7 @@ public class AuthController {
                 .maxAge(60 * 60 * 2) // Token valid for 2 hours
                 .secure(false)// Change to true in production
                 .sameSite("Strict")
+                .domain("auth-service-production-cd9b.up.railway.app")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
         return ResponseEntity.status(HttpStatus.CREATED).build();

@@ -7,6 +7,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 public class SecurityConfig {
 
@@ -17,7 +19,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // Enable CORS to allow requests from the frontend (e.g., localhost:8080)
-                .cors(Customizer.withDefaults())
+                .cors(withDefaults())
 
                 // Define public and protected endpoints
                 .authorizeHttpRequests(auth -> auth
@@ -38,7 +40,7 @@ public class SecurityConfig {
                 )
 
                 // Enable basic HTTP authentication (used here mainly for Swagger testing)
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(withDefaults())
 
                 // Build the security configuration
                 .build();

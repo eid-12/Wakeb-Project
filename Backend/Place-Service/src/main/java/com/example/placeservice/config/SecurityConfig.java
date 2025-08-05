@@ -7,6 +7,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration // Marks this class as a Spring configuration class
 public class SecurityConfig {
 
@@ -18,7 +20,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // Enable default CORS settings (allows frontend apps to communicate)
-                .cors(Customizer.withDefaults())
+                .cors(withDefaults())
 
                 // Define authorization rules
                 .authorizeHttpRequests(auth -> auth

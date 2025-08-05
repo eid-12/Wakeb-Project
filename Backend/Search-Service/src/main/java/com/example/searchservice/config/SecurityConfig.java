@@ -7,6 +7,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 public class SecurityConfig {
 
@@ -14,7 +16,7 @@ public class SecurityConfig {
     SecurityFilterChain filter(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF protection (useful for stateless APIs)
-                .cors(Customizer.withDefaults()) // Enable default CORS configuration
+                .cors(withDefaults()) // Enable default CORS configuration
                 .authorizeHttpRequests(auth -> auth
                         // Allow all OPTIONS requests (pre-flight requests for CORS)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -30,7 +32,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 // Enable basic HTTP authentication
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(withDefaults())
                 .build();
     }
 }

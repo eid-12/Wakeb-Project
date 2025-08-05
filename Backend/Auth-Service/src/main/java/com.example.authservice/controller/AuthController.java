@@ -29,7 +29,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request, HttpServletResponse response) {
         String token = authService.register(request).token();
-
         // Create a secure HTTP-only cookie to store the token
         ResponseCookie cookie = ResponseCookie.from("token", token)
                 .httpOnly(true)
@@ -37,6 +36,7 @@ public class AuthController {
                 .maxAge(60 * 60 * 2) // Token valid for 2 hours
                 .secure(false)// Change to true in production
                 .sameSite("Strict")
+                .domain("up.railway.app")
                 .domain("auth-service-production-cd9b.up.railway.app")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
@@ -49,11 +49,12 @@ public class AuthController {
         String token = authService.login(request).token(); // Get only the token
 
         ResponseCookie cookie = ResponseCookie.from("token", token)
-                .httpOnly(false)
+                .httpOnly(true)
                 .path("/")
                 .maxAge(60 * 60 * 2)
                 .secure(false)// Change to true in production
                 .sameSite("Strict")
+                .domain("up.railway.app")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());

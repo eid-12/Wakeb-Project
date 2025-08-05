@@ -13,8 +13,8 @@
           <i class="fa-solid fa-user"></i> {{ user?.name }}
           </button>
 
-        <button v-if="isLoggedIn" class="logout-button" @click="logout">
-          <i class="fas fa-sign-out-alt" id="Logout"></i> Logout
+        <button id="Logout" v-if="isLoggedIn" class="logout-button" @click="logout">
+          <i class="fas fa-sign-out-alt" ></i> Logout
         </button>
         <button v-else class="logout-button" @click="showLogin = true">
           <i class="fas fa-user"></i> Login

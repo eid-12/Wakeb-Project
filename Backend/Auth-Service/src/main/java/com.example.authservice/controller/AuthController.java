@@ -30,6 +30,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request, HttpServletResponse response) {
         String token = authService.register(request).token();
+        response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from("token","")
+                .path("/")
+                .sameSite("None")
+                .secure(true)
+                .maxAge(0)               // delete
+                .build().toString());
         // Create a secure HTTP-only cookie to store the token
         ResponseCookie cookie = ResponseCookie.from("token", token)
                 .httpOnly(true)

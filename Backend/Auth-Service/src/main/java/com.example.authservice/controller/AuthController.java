@@ -38,13 +38,9 @@ public class AuthController {
                 .secure(true)// Change to true in production
                 .sameSite("None")
                 .domain("up.railway.app")
-                .domain("auth-service-production-cd9b.up.railway.app")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
-//        return ResponseEntity.status(HttpStatus.CREATED).build();
-        return ResponseEntity.status(201)
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // Login a user and return a token as an HTTP-only cookie

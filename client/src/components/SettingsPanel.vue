@@ -87,14 +87,14 @@
   <!-- Password Modal -->
   <div v-if="showPasswordModal" class="modal-overlay" @keydown.esc="closePasswordModal" tabindex="0">
     <div class="modal-card">
-      <h3 class="text-xl font-semibold mb-4">Change Password</h3>
+      <h3 class="text-xl font-semibold mb-4" id="changtit">Change Password</h3>
 
       <input v-model="passwordForm.current" type="password" placeholder="Current password" class="input" />
       <input v-model="passwordForm.new"     type="password" placeholder="New password"      class="input" />
       <input v-model="passwordForm.confirm" type="password" placeholder="Confirm new password" class="input" />
 
       <div class="modal-actions">
-        <button class="btn-cancel"  @click="closePasswordModal">Cancel</button>
+        <button class="btn-cancel"  @click="closePasswordModal" id="changtit">Cancel</button>
         <button class="btn-primary" @click="submitPassword">Save</button>
       </div>
     </div>
@@ -103,13 +103,13 @@
   <!-- Email Modal -->
   <div v-if="showEmailModal" class="modal-overlay" @keydown.esc="closeEmailModal" tabindex="0">
     <div class="modal-card">
-      <h3 class="text-xl font-semibold mb-4">Change Email</h3>
+      <h3 class="text-xl font-semibold mb-4" id="changtit">Change Email</h3>
 
       <input v-model="emailForm.newEmail" type="email"    placeholder="New email address" class="input" />
       <input v-model="emailForm.password" type="password" placeholder="Current password"  class="input" />
 
       <div class="modal-actions">
-        <button class="btn-cancel"  @click="closeEmailModal">Cancel</button>
+        <button class="btn-cancel"  @click="closeEmailModal" id="changtit">Cancel</button>
         <button class="btn-primary" @click="submitEmail">Save</button>
       </div>
     </div>
@@ -118,7 +118,7 @@
   <!-- Username Modal -->
   <div v-if="showUsernameModal" class="modal-overlay" @click.self="closeUsernameModal" @keydown.esc="closeUsernameModal" tabindex="0">
     <div class="modal-card">
-      <h3 class="text-xl font-semibold mb-4">Change Username</h3>
+      <h3 class="text-xl font-semibold mb-4" id="changtit" >Change Username</h3>
 
       <input v-model.trim="usernameForm.newUsername" type="text" placeholder="New username" class="input" />
 
@@ -127,7 +127,7 @@
       </p>
 
       <div class="modal-actions mt-4">
-        <button class="btn-cancel"  @click="closeUsernameModal">Cancel</button>
+        <button class="btn-cancel"  @click="closeUsernameModal" id="changtit" >Cancel</button>
         <button class="btn-primary"
                 :disabled="savingUsername || invalidUsername || !usernameForm.newUsername.trim()"
                 @click="submitUsername">
@@ -341,5 +341,8 @@ function manageSearchData() {
 }
 .btn-primary {
   @apply bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded;
+}
+#changtit{
+  color: white;
 }
 </style>

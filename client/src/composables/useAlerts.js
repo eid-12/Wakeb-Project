@@ -42,7 +42,7 @@ export function useAlerts() {
   async function showPasswordPrompt({ title = 'Enter Password', label = 'Password', confirmText = 'Submit', cancelText = 'Cancel' } = {}) {
     const result = await Swal.fire({
       title,
-      input: 'password',
+      input: 'text',
       inputLabel: label,
       inputPlaceholder: 'Enter new password',
       inputAttributes: {

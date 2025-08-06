@@ -482,7 +482,7 @@ const content = `
 
 
 
-  map.once('popupopen', () => {
+  map.once('popupopen', (ev)  => {
     const btn = document.getElementById(btnId);
     if (!btn) return;
     leaflet.DomEvent.disableClickPropagation(btn);

@@ -9,9 +9,19 @@
     </div>
 
     <!-- Password -->
-    <div class="input-group">
+    <div class="relative">
+    <div class="input-group pr-10">
       <i class="fas fa-lock"></i>
-      <input type="password" placeholder="Password" v-model="form.password" />
+      <input type="showPwd.password ? 'text' : 'password'" placeholder="Password" v-model="form.password" />
+          <button
+        type="button"
+        class="eye-btn"
+        @click="showPwd.password = !showPwd.password"
+        :aria-label="showPwd.current ? 'Hide password' : 'Show password'"
+      >
+        <i :class="showPwd.password ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+      </button>
+    </div>
     </div>
 
 
@@ -19,13 +29,23 @@
 
 
     <!-- Confirm Password (for Sign-Up) -->
-    <div v-if="isRegister" class="input-group">
+     <div class="relative">
+    <div v-if="isRegister" class="input-group pr-10">
       <i class="fas fa-lock"></i>
       <input
-        type="password"
+        type="showPwd.confirmPassword ? 'text' : 'password'"
         placeholder="Confirm Password"
         v-model="form.confirmPassword"
       />
+    </div>
+    <button
+        type="button"
+        class="eye-btn"
+        @click="showPwd.confirmPassword = !showPwd.confirmPassword"
+        :aria-label="showPwd.confirmPassword ? 'Hide password' : 'Show password'"
+      >
+        <i :class="showPwd.confirmPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+      </button>
     </div>
 
     <!-- Submit -->
@@ -63,6 +83,7 @@ const form = ref({
   password: '',
   confirmPassword: '',
 });
+const showPwd = reactive({ password: false, confirmPassword: false });
 
 const resetForm = () => {
   form.value = {
@@ -238,4 +259,12 @@ defineExpose({
   cursor: pointer;
   
 }
+
+.eye-btn {
+  @apply absolute right-2 top-1/2 -translate-y-1/2
+         h-8 w-8 grid place-items-center rounded
+         text-gray-600 dark:text-gray-300
+         hover:bg-black/5 dark:hover:bg-white/10;
+}
+
 </style>

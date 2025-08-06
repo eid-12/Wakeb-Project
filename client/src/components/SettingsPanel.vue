@@ -89,39 +89,31 @@
     <div class="modal-card">
       <h3 class="text-xl font-semibold mb-4" id="changtit">Change Password</h3>
 
-          <div class="relative">
 
-      <input v-model="passwordForm.current" :type="showPwd.current ? 'text' : 'password'" placeholder="Current password" class="input pr-10" />
-            <button
-        type="button"
-        class="eye-btn"
-        @click="showPwd.current = !showPwd.current"
-        :aria-label="showPwd.current ? 'Hide password' : 'Show password'">
-        <i :class="showPwd.current ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
-      </button>
-    </div>
+      <input v-model="passwordForm.current" :type= "text" placeholder="Current password" class="input " />
+ 
 
     <div class="relative">
 
-      <input v-model="passwordForm.new"     :type="showPwd.current ? 'text' : 'password'" placeholder="New password"      class="input pr-10" />
+      <input v-model="passwordForm.new"     :type="showPwd.new  ? 'text' : 'password'" placeholder="New password"      class="input pr-10" />
             <button
         type="button"
         class="eye-btn"
-        @click="showPwd.current = !showPwd.current"
-        :aria-label="showPwd.current ? 'Hide password' : 'Show password'">
-        <i :class="showPwd.current ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+        @click="showPwd.new  = !showPwd.new "
+        :aria-label="showPwd.new  ? 'Hide password' : 'Show password'">
+        <i :class="showPwd.new  ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
       </button>
 
 </div>
           <div class="relative">
 
-      <input v-model="passwordForm.confirm" :type="showPwd.current ? 'text' : 'password'" placeholder="Confirm new password" class="input pr-10" />
+      <input v-model="passwordForm.confirm" :type="showPwd.confirm  ? 'text' : 'password'" placeholder="Confirm new password" class="input pr-10" />
             <button
         type="button"
         class="eye-btn"
-        @click="showPwd.current = !showPwd.current"
-        :aria-label="showPwd.current ? 'Hide password' : 'Show password'">
-        <i :class="showPwd.current ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+        @click="showPwd.confirm  = !showPwd.confirm "
+        :aria-label="showPwd.confirm  ? 'Hide password' : 'Show password'">
+        <i :class="showPwd.confirm  ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
       </button>
 
       </div>
@@ -199,7 +191,7 @@ const settings = reactive({
   syncPlaces: false,
   exportFavorites: false
 });
-const showPwd = reactive({ current: false, new: false, confirm: false });
+const showPwd = reactive({ new: false, confirm: false });
 
 const { user, setUser } = useUser();
 

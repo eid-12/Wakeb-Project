@@ -164,7 +164,6 @@ const resultMarker   = ref(null);
 const routeControl   = ref(null);
 const searchResults  = ref(null);
 const selectedPlace = ref(null);
-const btnId = `fav-${Date.now()}`;
 let dest  = "";
 
 let map;         
@@ -456,7 +455,7 @@ map.on('click', async (e) => {
 
   }
   const canSave = isLoggedIn.value;
-
+  const btnId = `save-btn-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
 const content = `
   <div style="text-align:right">
     <h3 style="margin:0 0 6px 0;font-size:1.1rem;color:#111;">${placeName[0]}</h3>
@@ -466,7 +465,7 @@ const content = `
     </p>
       ${
         canSave
-          ? `<button id="${btnId}" style="margin-top:6px;padding:6px 14px;border-radius:6px;background:#059669;z-index:6000;color:#fff;font-size:0.9rem ">
+          ? `<button id="${btnId}" style="margin-top:6px;padding:6px 14px;border-radius:6px;background:#059669;z-index:6000;position:relative;color:#fff;font-size:0.9rem ">
                ⭐ Add to Saved Places
              </button>`
           : ``
@@ -485,11 +484,15 @@ const content = `
 
   map.on('popupopen', () => {
     const btn = document.getElementById(btnId);
-    if (btn) {
-      btn.addEventListener('click', () => {
-        addToFavorites({ lat, lng });   
-      });
-    }
+    if (!btn) return;
+    L.DomEvent.disableClickPropagation(btn);
+
+    btn.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      addToFavorites({ lat, lng });
+      map.closePopup();
+    });
   });
 
 

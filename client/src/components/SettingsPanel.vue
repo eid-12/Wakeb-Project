@@ -232,7 +232,7 @@ async function submitPassword() {
     showAlert({ type: 'success', title: 'Success', message: 'Password changed successfully ✔' });
     closePasswordModal();
   } catch (e) {
-    showAlert({ type: 'danger', title: 'Error', message: e.response?.data?.message || 'Error changing password' });
+    showAlert({ type: 'danger', title: 'Error', message: e.response?.data?.message || 'Error changing password or The Wrong Current Password' });
   } finally {
     passwordLoading.value = false;
   }

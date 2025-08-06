@@ -157,12 +157,20 @@ const data = await searchPlace(q, {
   }, 750);
 };
 
-const selectResult = feature => {
+const selectResult = async (feature) => {
+  if (!feature) return;
+
   selectedResult.value = feature;
-   await searchpo (selectedResult.value)
-    emit("removeResult");
-  emit("plotResult", feature.geometry);
+
+  try {
+    await searchpo(selectedResult.value);   
+    emit('removeResult');
+    emit('plotResult', feature.geometry);
+  } catch (err) {
+    console.error('searchpo failed:', err);
+  }
 };
+
 
 const removeResults = () => {
   selectedResult.value = null;

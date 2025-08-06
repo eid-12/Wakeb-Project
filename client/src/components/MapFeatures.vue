@@ -164,7 +164,7 @@ const selectResult = async (feature) => {
   console.log(feature)
 
   try {
-    await searchpo(feature.properties.address);   
+    await searchpo(feature.place_name);   
     emit('removeResult');
     emit('plotResult', feature.geometry);
   } catch (err) {

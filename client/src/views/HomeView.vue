@@ -461,39 +461,37 @@ const content = `
     <h3 style="margin:0 0 6px 0;font-size:1.1rem;color:#111;">${placeName[0]}</h3>
     <p style="margin:0 0 6px 0;color:#555;">${placeName[1]}</p>
     <p style="margin:0 0 6px 0;font-size:0.85rem;color:#666;">
-      الموقع: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+      Location: ${lat.toFixed(5)}, ${lng.toFixed(5)}
     </p>
       ${
         canSave
-          ? `<button id="${btnId}" style="margin-top:6px;padding:6px 14px;border-radius:6px;background:#059669;z-index:300;position:relative;color:#fff;font-size:0.9rem ">
+          ? `<button id="${btnId}" type="button" style="margin-top:6px;padding:6px 14px;border-radius:6px;background:#059669;z-index:300;position:relative;color:#fff;font-size:0.9rem ">
                ⭐ Add to Saved Places
              </button>`
           : ``
       }
   </div>
 `;
+  const container = document.createElement('div');
+  container.innerHTML = content;
 
-
-  leaflet
-    .popup({ closeButton: true, offset: [0, -10] })
-    .setLatLng(e.latlng)
-    .setContent(content)
-    .openOn(map);
-
-
-
-  map.once('popupopen', (ev)  => {
-    const btn = document.getElementById(btnId);
-    if (!btn) return;
-    leaflet.DomEvent.disableClickPropagation(btn);
-
-    btn.addEventListener('click', (evt) => {
-      evt.preventDefault();
-      evt.stopPropagation();
+  const btn = container.querySelector(`#${CSS.escape(btnId)}`);
+  if (btn) {
+    leaflet.DomEvent.disableClickPropagation(container);
+    leaflet.DomEvent.disableScrollPropagation(container);
+    
+btn.addEventListener('click', (evt) => {
+      leaflet.DomEvent.stop(evt); // preventDefault + stopPropagation
       addToFavorites({ lat, lng });
       map.closePopup();
-    });
-  });
+    }, { once: true });
+  }
+
+  // 4) افتح البوب-أب بمحتوى الـ DOM الجاهز
+  leaflet.popup({ closeButton: true, offset: [0, -10], autoPan: true })
+    .setLatLng(e.latlng)
+    .setContent(container)   // << DOM node وليس نص فقط
+    .openOn(map);
 });
 
   map.on('moveend', closeSearchResults);

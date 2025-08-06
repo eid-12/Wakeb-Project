@@ -485,13 +485,14 @@ const content = `
   map.on('popupopen', () => {
     const btn = document.getElementById(btnId);
     if (!btn) return;
-    L.DomEvent.disableClickPropagation(btn);
+    leaflet.DomEvent.disableClickPropagation(btn);
 
     btn.addEventListener('click', (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
       addToFavorites({ lat, lng });
-      map.closePopup();
+      // اختياري: اقفل الـpopup بعد الإضافة
+      // map.closePopup();
     });
   });
 

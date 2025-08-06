@@ -84,6 +84,7 @@
 import { ref, onMounted, computed  } from 'vue'
 import { useUser, getUser , deleteUser, toggleUserRole,resetUserPassword ,fetchUsersByPage} from '@/api/user'
 import { useAlerts } from '@/composables/useAlerts'
+import { text } from 'express'
 const { showAlert, showConfirm , showPasswordPrompt } = useAlerts()      
 
 const { user, setUser } = useUser()
@@ -160,6 +161,7 @@ async function resetPassword(user1) {
   const newPassword = await showPasswordPrompt({
     title: `Reset Password for ${user1.name}`,
     label: 'New Password',
+    type : 'text',
     confirmText: 'Reset',
     cancelText: 'Cancel'
   });

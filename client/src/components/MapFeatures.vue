@@ -72,7 +72,7 @@
 
 import { ref, onUnmounted } from "vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
-import { searchPlace } from '@/api/http.js'; 
+import { searchPlace ,searchpo } from '@/api/user.js'; 
 
 const props = defineProps({
   fetchCoords: Boolean,
@@ -159,6 +159,7 @@ const data = await searchPlace(q, {
 
 const selectResult = feature => {
   selectedResult.value = feature;
+   await searchpo (selectedResult.value)
     emit("removeResult");
   emit("plotResult", feature.geometry);
 };

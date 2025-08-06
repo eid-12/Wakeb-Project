@@ -1,4 +1,4 @@
-import { API_GATEWAY ,AUTH_API  } from '@/api/http'
+import { API_GATEWAY ,AUTH_API ,MAPBOX_API  } from '@/api/http'
 import {  onMounted , ref } from 'vue';
 
 export const getUser = async () => {
@@ -94,4 +94,17 @@ export function useUser() {
 }
 
 
+export const searchPlace = async (query, params) => {
+  try {
+    const urlParams = new URLSearchParams({
+      access_token: process.env.VUE_APP_API_KEY,
+      ...params,
+    });
 
+    const response = await MAPBOX_API.get(`${encodeURIComponent(query)}.json?${urlParams.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error('Search error:', error.message);
+    throw error;
+  }
+};

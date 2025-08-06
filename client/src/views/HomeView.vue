@@ -487,10 +487,9 @@ btn.addEventListener('click', (evt) => {
     }, { once: true });
   }
 
-  // 4) افتح البوب-أب بمحتوى الـ DOM الجاهز
   leaflet.popup({ closeButton: true, offset: [0, -10], autoPan: true })
     .setLatLng(e.latlng)
-    .setContent(container)   // << DOM node وليس نص فقط
+    .setContent(container)  
     .openOn(map);
 });
 

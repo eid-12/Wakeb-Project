@@ -491,8 +491,7 @@ const content = `
       evt.preventDefault();
       evt.stopPropagation();
       addToFavorites({ lat, lng });
-      // اختياري: اقفل الـpopup بعد الإضافة
-      // map.closePopup();
+      map.closePopup();
     });
   });
 

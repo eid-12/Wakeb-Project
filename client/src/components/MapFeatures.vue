@@ -163,7 +163,7 @@ const selectResult = async (feature) => {
   selectedResult.value = feature;
 
   try {
-    await searchpo(feature);   
+    await searchpo(feature.place_name_en);   
     emit('removeResult');
     emit('plotResult', feature.geometry);
   } catch (err) {

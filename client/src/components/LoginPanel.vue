@@ -9,44 +9,41 @@
     </div>
 
     <!-- Password -->
-    <div class="relative">
-    <div class="input-group pr-10">
-      <i class="fas fa-lock"></i>
-      <input type="showPwd.password ? 'text' : 'password'" placeholder="Password" v-model="form.password" />
-          <button
-        type="button"
-        class="eye-btn"
-        @click="showPwd.password = !showPwd.password"
-        :aria-label="showPwd.current ? 'Hide password' : 'Show password'"
-      >
-        <i :class="showPwd.password ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
-      </button>
-    </div>
-    </div>
+<div class="input-group">
+  <i class="fas fa-lock"></i>
+  <input
+    :type="show.password ? 'text' : 'password'"
+    placeholder="Password"
+    v-model="form.password"
+  />
+  <button
+    type="button"
+    class="toggle-eye"
+    @click="show.password = !show.password"
+    :aria-label="show.password ? 'Hide password' : 'Show password'"
+  >
+    <i :class="show.password ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+  </button>
+</div>
 
+<!-- Confirm Password -->
+<div v-if="isRegister" class="input-group">
+  <i class="fas fa-lock"></i>
+  <input
+    :type="show.confirm ? 'text' : 'password'"
+    placeholder="Confirm Password"
+    v-model="form.confirmPassword"
+  />
+  <button
+    type="button"
+    class="toggle-eye"
+    @click="show.confirm = !show.confirm"
+    :aria-label="show.confirm ? 'Hide password' : 'Show password'"
+  >
+    <i :class="show.confirm ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+  </button>
+</div>
 
-
-
-
-    <!-- Confirm Password (for Sign-Up) -->
-     <div class="relative">
-    <div v-if="isRegister" class="input-group pr-10">
-      <i class="fas fa-lock"></i>
-      <input
-        type="showPwd.confirmPassword ? 'text' : 'password'"
-        placeholder="Confirm Password"
-        v-model="form.confirmPassword"
-      />
-    </div>
-    <button
-        type="button"
-        class="eye-btn"
-        @click="showPwd.confirmPassword = !showPwd.confirmPassword"
-        :aria-label="showPwd.confirmPassword ? 'Hide password' : 'Show password'"
-      >
-        <i :class="showPwd.confirmPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
-      </button>
-    </div>
 
     <!-- Submit -->
     <button class="sign-in-btn" @click="handleSubmit">
@@ -68,7 +65,7 @@
 
 <script setup>
 /* global defineEmits defineExpose */  
-import { ref } from 'vue';
+import { ref ,reactive} from 'vue';
 import { useAlerts } from '@/composables/useAlerts';
 import { registerUser, loginUser, getUser, useUser } from '@/api/user'
 
@@ -83,7 +80,11 @@ const form = ref({
   password: '',
   confirmPassword: '',
 });
-const showPwd = reactive({ password: false, confirmPassword: false });
+
+const show = reactive({
+  password: false,
+  confirm: false
+});
 
 const resetForm = () => {
   form.value = {
@@ -260,11 +261,13 @@ defineExpose({
   
 }
 
-.eye-btn {
-  @apply absolute right-2 top-1/2 -translate-y-1/2
-         h-8 w-8 grid place-items-center rounded
-         text-gray-600 dark:text-gray-300
-         hover:bg-black/5 dark:hover:bg-white/10;
+
+.input-group { position: relative; display: flex; align-items: center; gap: 8px; }
+.input-group input { width: 100%; padding-right: 2.25rem; }
+.toggle-eye {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: transparent; border: 0; cursor: pointer; padding: 4px;
 }
+.toggle-eye i { font-size: 1rem; }
 
 </style>

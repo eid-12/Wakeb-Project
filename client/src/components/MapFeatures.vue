@@ -163,11 +163,11 @@ const selectResult = async (feature) => {
   selectedResult.value = feature;
 
   try {
-    await searchpo(selectedResult.value);   
+    await searchpo(feature);   
     emit('removeResult');
     emit('plotResult', feature.geometry);
   } catch (err) {
-    console.error('searchpo failed:', err);
+    console.error('search failed:', err);
   }
 };
 

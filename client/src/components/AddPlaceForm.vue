@@ -3,16 +3,18 @@
     <div class="w-full md:max-w-3xl bg-white shadow-lg rounded-xl p-8">
       <h1 class="text-2xl font-bold text-center mb-8 text-emerald-700">Add Unlisted Place</h1>
       <form @submit.prevent="submitPlace" class="space-y-5">
-        <input v-model="place.name" placeholder="Place Name" class="input" />
+
+        <input required  v-model="place.name" placeholder="Place Name" class="input" />
+
         <textarea v-model="place.description" placeholder="Description" rows="3" class="input"></textarea>
         <select v-model="place.category" class="input">
-          <option disabled value="">-- Select a category --</option>
+          <option required  disabled value="">-- Select a category --</option>
           <option>Public</option><option>Private</option>
           <option>Confidential</option><option>Top Secret</option>
         </select>
         <div class="flex gap-4">
-          <input v-model="place.latitude" placeholder="Latitude" class="input" />
-          <input v-model="place.longitude" placeholder="Longitude" class="input" />
+          <input required  v-model="place.latitude" placeholder="Latitude" class="input" />
+          <input required  v-model="place.longitude" placeholder="Longitude" class="input" />
         </div>
         <input type="file" @change="handleImageUpload" class="input-file" />
         <textarea v-model="place.notes" placeholder="Optional Notes" rows="2" class="input"></textarea>

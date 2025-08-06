@@ -294,6 +294,8 @@ async function submitUsername() {
   savingUsername.value = true;
   try {
     await changeUsername(user.value.id, usernameForm.newUsername);
+      const u = await getUser();
+  setUser(u);
     showAlert({ type: 'success', title: 'Updated', message: 'Username updated successfully ✔' });
     closeUsernameModal();
   } catch (e) {

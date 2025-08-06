@@ -558,5 +558,7 @@ line-height: 1.9;
   background: transparent;
 }
 .user-flag i{ @apply text-sm; }
+.leaflet-popup-content,
+.leaflet-popup-content * { pointer-events: auto; }
 
 </style>  

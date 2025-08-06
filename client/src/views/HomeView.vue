@@ -479,7 +479,7 @@ const content = `
     .setLatLng(e.latlng)
     .setContent(content)
     .openOn(map);
-});
+
 
 
   map.on('popupopen', () => {
@@ -494,7 +494,7 @@ const content = `
       map.closePopup();
     });
   });
-
+});
 
   map.on('moveend', closeSearchResults);
   getGeolocation();

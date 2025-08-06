@@ -466,7 +466,7 @@ const content = `
     </p>
       ${
         canSave
-          ? `<button id="${btnId}" style="margin-top:6px;padding:6px 14px;border-radius:6px;background:#059669;color:#fff;font-size:0.9rem z-6000">
+          ? `<button id="${btnId}" style="margin-top:6px;padding:6px 14px;border-radius:6px;background:#059669;z-index:6000;color:#fff;font-size:0.9rem ">
                ⭐ Add to Saved Places
              </button>`
           : ``

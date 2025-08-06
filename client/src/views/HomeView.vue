@@ -390,8 +390,8 @@ onMounted( () => {
   map = leaflet.map('map', {
     center          : [24.7136, 46.6753],
     zoom            : 11,
-    minZoom         : 5,
-    maxZoom         : 16,
+    // minZoom         : 5,
+    // maxZoom         : 16,
     maxBounds       : WORLD_BOUNDS,
     maxBoundsViscosity: 1,
     inertia         : false,

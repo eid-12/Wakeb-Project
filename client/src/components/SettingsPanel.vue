@@ -89,10 +89,42 @@
     <div class="modal-card">
       <h3 class="text-xl font-semibold mb-4" id="changtit">Change Password</h3>
 
-      <input v-model="passwordForm.current" type="password" placeholder="Current password" class="input" />
-      <input v-model="passwordForm.new"     type="password" placeholder="New password"      class="input" />
-      <input v-model="passwordForm.confirm" type="password" placeholder="Confirm new password" class="input" />
+          <div class="relative">
 
+      <input v-model="passwordForm.current" :type="showPwd.current ? 'text' : 'password'" placeholder="Current password" class="input pr-10" />
+            <button
+        type="button"
+        class="eye-btn"
+        @click="showPwd.current = !showPwd.current"
+        :aria-label="showPwd.current ? 'Hide password' : 'Show password'">
+        <i :class="showPwd.current ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+      </button>
+    </div>
+
+    <div class="relative">
+
+      <input v-model="passwordForm.new"     :type="showPwd.current ? 'text' : 'password'" placeholder="New password"      class="input pr-10" />
+            <button
+        type="button"
+        class="eye-btn"
+        @click="showPwd.current = !showPwd.current"
+        :aria-label="showPwd.current ? 'Hide password' : 'Show password'">
+        <i :class="showPwd.current ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+      </button>
+
+</div>
+          <div class="relative">
+
+      <input v-model="passwordForm.confirm" :type="showPwd.current ? 'text' : 'password'" placeholder="Confirm new password" class="input pr-10" />
+            <button
+        type="button"
+        class="eye-btn"
+        @click="showPwd.current = !showPwd.current"
+        :aria-label="showPwd.current ? 'Hide password' : 'Show password'">
+        <i :class="showPwd.current ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+      </button>
+
+      </div>
       <div class="modal-actions">
         <button class="btn-cancel"  @click="closePasswordModal" id="changtit">Cancel</button>
         <button class="btn-primary" @click="submitPassword">Save</button>
@@ -106,7 +138,7 @@
       <h3 class="text-xl font-semibold mb-4" id="changtit">Change Email</h3>
 
       <input v-model="emailForm.newEmail" type="email"    placeholder="New email address" class="input" />
-      <input v-model="emailForm.password" type="password" placeholder="Current password"  class="input" />
+      <input v-model="emailForm.oldEmail" type="email" placeholder="Current Email or Confirm "  class="input" />
 
       <div class="modal-actions">
         <button class="btn-cancel"  @click="closeEmailModal" id="changtit">Cancel</button>
@@ -167,6 +199,7 @@ const settings = reactive({
   syncPlaces: false,
   exportFavorites: false
 });
+const showPwd = reactive({ current: false, new: false, confirm: false });
 
 const { user, setUser } = useUser();
 
@@ -214,11 +247,11 @@ async function submitPassword() {
 }
 
 const showEmailModal = ref(false);
-const emailForm = reactive({ newEmail: '', password: '' });
+const emailForm = reactive({ newEmail: '', oldEmail: '' });
 
 function closeEmailModal() {
   showEmailModal.value = false;
-  Object.assign(emailForm, { newEmail: '', password: '' });
+  Object.assign(emailForm, { newEmail: '', oldEmail: '' });
 }
 
 async function submitEmail() {
@@ -228,7 +261,7 @@ if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailForm.newEmail)) {
 }
 
   try {
-    await changeEmail(emailForm.newEmail, emailForm.password);
+    await changeEmail(emailForm.newEmail, emailForm.oldEmail);
     showAlert({ type: 'success', title: 'Updated', message: 'Email updated successfully ✔' });
     closeEmailModal();
   } catch (e) {
@@ -345,4 +378,11 @@ function manageSearchData() {
 #changtit{
   color: white;
 }
+.eye-btn {
+  @apply absolute right-2 top-1/2 -translate-y-1/2
+         h-8 w-8 grid place-items-center rounded
+         text-gray-600 dark:text-gray-300
+         hover:bg-black/5 dark:hover:bg-white/10;
+}
+
 </style>

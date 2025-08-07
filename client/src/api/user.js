@@ -42,9 +42,7 @@ export const clearSearchHistory = () =>
 
 
 export function submitPlac (formData) {
-  return API_GATEWAY.post('/place/places', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })
+  return API_GATEWAY.post('/place/places', formData)
 }
 
 export const fetchPlace = () =>

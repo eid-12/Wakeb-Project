@@ -109,8 +109,8 @@ async function submitPlace() {
   form.append('name',         place.value.name)
   form.append('description',  place.value.description)
   form.append('category',     place.value.category)
-form.append('latitude',    String(place.latitude))
-form.append('longitude',   String(place.longitude))
+form.append('latitude',    String(place.value.latitude))
+form.append('longitude',   String(place.value.longitude))
   if (imageFile.value) {
     form.append('image', imageFile.value)   
   }

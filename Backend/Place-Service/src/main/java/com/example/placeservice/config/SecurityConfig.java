@@ -32,7 +32,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**",
                                 "/api/auth/**", "/api/place/**"  ,"/error" // <-- likely temporary during dev
                         ).permitAll()
-
+                        .requestMatchers(HttpMethod.POST, "/place").permitAll()
                         // Require authentication for any other request
                         .anyRequest().authenticated()
                 )

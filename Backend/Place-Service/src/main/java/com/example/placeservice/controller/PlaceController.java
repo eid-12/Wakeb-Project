@@ -43,7 +43,7 @@ public class PlaceController {
     // POST /api/place
     // Adds a new place for the current user
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE ,value = "/places")
-    public ResponseEntity<PlaceRequest>  add(
+    public ResponseEntity<?>  add(
             @RequestHeader("X-User-Id") int userId,
             @RequestPart("image") MultipartFile image,
             @RequestPart("name")    String name,
@@ -74,7 +74,11 @@ public class PlaceController {
         );
         Place saved = placeRepo.save(place);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new PlaceRequest(name, description,
+                        category, latitude, longitude));
     }
 
     // DELETE /api/place/{placeId}

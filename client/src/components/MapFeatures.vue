@@ -158,11 +158,7 @@ const data = await searchPlace(q, {
 };
 
 const selectResult = async (feature) => {
-  if (!feature) return;
-
   selectedResult.value = feature;
-  console.log(feature)
-
   try {
     await searchpo(feature.place_name);   
     emit('removeResult');

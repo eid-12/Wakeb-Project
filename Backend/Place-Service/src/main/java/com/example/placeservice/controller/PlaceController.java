@@ -42,7 +42,7 @@ public class PlaceController {
 
     // POST /api/place
     // Adds a new place for the current user
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE ,value = "/place")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE ,value = "/places")
     public ResponseEntity<PlaceRequest>  add(
             @RequestHeader("X-User-Id") int userId,
             @RequestPart("image") MultipartFile image,

@@ -109,8 +109,8 @@ async function submitPlace() {
   form.append('name',         place.value.name)
   form.append('description',  place.value.description)
   form.append('category',     place.value.category)
-form.append('latitude',    String(place.value.latitude))
-form.append('longitude',   String(place.value.longitude))
+  form.append('latitude',     place.value.latitude)
+  form.append('longitude',    place.value.longitude)
   if (imageFile.value) {
     form.append('image', imageFile.value)   
   }
@@ -126,7 +126,7 @@ const res = await submitPlac(form)
     });
     resetForm()
   } catch (err) {
-    console.error(err);
+    console.error(err)
     showAlert({
       type: 'danger',
       title: 'Error',

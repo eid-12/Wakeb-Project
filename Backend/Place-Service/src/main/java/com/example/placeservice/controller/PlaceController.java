@@ -16,6 +16,7 @@ import com.example.placeservice.repository.PlaceRepository;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,24 +50,30 @@ public class PlaceController {
             @RequestPart("name")    String name,
             @RequestPart("description") String description,
             @RequestPart("category")    String category,
-            @RequestPart("latitude")    BigDecimal latitude,
-            @RequestPart("longitude") BigDecimal longitude
+            @RequestPart("latitude")    MultipartFile latitude,
+            @RequestPart("longitude") MultipartFile longitude
     ) throws IOException {
-
+        BigDecimal lat = new BigDecimal(
+                new String(latitude.getBytes(), StandardCharsets.UTF_8).trim());
+        BigDecimal lng = new BigDecimal(
+                new String(longitude.getBytes(), StandardCharsets.UTF_8).trim());
         // خزّنِ الصورة في Volume: /app/uploads
         Path uploadDir = Paths.get(System.getenv()
                 .getOrDefault("RAILWAY_VOLUME_MOUNT_PATH", "/app/uploads"));
         Files.createDirectories(uploadDir);
-        String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
-        image.transferTo(uploadDir.resolve(filename));
-        PlaceRequest dto = new PlaceRequest(name, description, category, latitude, longitude);
+        String filename = null;
+        if (image != null && !image.isEmpty()) {
+            filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
+            image.transferTo(uploadDir.resolve(filename));
+        }
+        PlaceRequest dto = new PlaceRequest(name, description, category, lat, lng);
 
         Place place = new Place(
                 null,                 // ID will be auto-generated
                 name,
                description,
-               latitude,
-               longitude,
+                lat,
+               lng,
                 filename,
                 null,                // createdAt will be auto-generated
                 category,
@@ -78,7 +85,7 @@ public class PlaceController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new PlaceRequest(name, description,
-                        category, latitude, longitude));
+                        category, lat, lng));
     }
 
     // DELETE /api/place/{placeId}

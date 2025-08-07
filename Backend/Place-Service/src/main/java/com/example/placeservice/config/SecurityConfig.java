@@ -30,7 +30,7 @@ public class SecurityConfig {
                         // Allow unauthenticated access to Swagger docs and specific public endpoints
                         .requestMatchers(
                                 "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**",
-                                "/api/auth/**", "/api/place/**" // <-- likely temporary during dev
+                                "/api/auth/**", "/api/place/**"  ,"/error" // <-- likely temporary during dev
                         ).permitAll()
 
                         // Require authentication for any other request

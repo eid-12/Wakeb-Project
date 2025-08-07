@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 public record PlaceRequest(
         String name,
         String description,
+        String category,
         BigDecimal latitude,
-        BigDecimal longitude,
-        String imagePath,
-        String category
+        BigDecimal longitude
+
 ) {}

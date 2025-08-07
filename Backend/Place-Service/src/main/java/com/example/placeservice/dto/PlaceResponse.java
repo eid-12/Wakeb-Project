@@ -11,7 +11,6 @@ public record PlaceResponse(
         String description,
         BigDecimal latitude,
         BigDecimal longitude,
-        String imagePath,
         Timestamp createdAt,
         String category,
         Integer userId

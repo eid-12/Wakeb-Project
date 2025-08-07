@@ -15,23 +15,6 @@ public class PlaceService {
 
     private final PlaceRepository placeRepo;
 
-    // Adds a new place for the specified user
-    public PlaceResponse add(Integer userId, PlaceRequest req) {
-        Place place = new Place(
-                null,                 // ID will be auto-generated
-                req.name(),
-                req.description(),
-                req.latitude(),
-                req.longitude(),
-                req.imagePath(),
-                null,                // createdAt will be auto-generated
-                req.category(),
-                userId
-        );
-
-        Place saved = placeRepo.save(place); // Save to database
-        return map(saved); // Return response DTO
-    }
 
     // Retrieves all places for a specific user (ordered by creation date)
     @Transactional(readOnly = true)
@@ -65,7 +48,6 @@ public class PlaceService {
                 p.getDescription(),
                 p.getLatitude(),
                 p.getLongitude(),
-                p.getImagePath(),
                 p.getCreatedAt(),
                 p.getCategory(),
                 p.getUserId()

@@ -45,7 +45,7 @@ public class PlaceController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE ,value = "/places")
     public ResponseEntity<?>  add(
             @RequestHeader("X-User-Id") int userId,
-            @RequestPart("image") MultipartFile image,
+            @RequestPart(value="image" ,    required=false) MultipartFile image,
             @RequestPart("name")    String name,
             @RequestPart("description") String description,
             @RequestPart("category")    String category,

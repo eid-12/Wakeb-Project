@@ -74,7 +74,7 @@ defineEmits(['view'])
 
 const place = ref({
   name: '', description: '', category: '',
-  latitude: '', longitude: '', notes: '', image: null
+  latitude: '', longitude: '', notes: '', image: ''
 })
 
 const imageFile = ref(null)
@@ -90,7 +90,7 @@ function handleImageUpload(e) {
 function resetForm() {
   place.value = {
     name: '', description: '', category: '',
-    latitude: '', longitude: '', notes: '', image: null
+    latitude: '', longitude: '', notes: '', image: ''
   }
   imageFile.value = null
 }
@@ -130,7 +130,7 @@ const res = await submitPlac(form)
     showAlert({
       type: 'danger',
       title: 'Error',
-      message: 'Failed to add place'
+      message: err.response?.data ?? 'Failed to add place'
     });
   }
 }

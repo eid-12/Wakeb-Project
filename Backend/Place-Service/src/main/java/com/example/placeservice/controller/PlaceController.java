@@ -50,31 +50,28 @@ public class PlaceController {
             @RequestPart("name")    String name,
             @RequestPart("description") String description,
             @RequestPart("category")    String category,
-            @RequestPart("latitude")    MultipartFile latitude,
-            @RequestPart("longitude") MultipartFile longitude
+            @RequestPart("latitude")    BigDecimal latitude,
+            @RequestPart("longitude") BigDecimal longitude
     ) throws IOException {
-        BigDecimal lat = new BigDecimal(
-                new String(latitude.getBytes(), StandardCharsets.UTF_8).trim());
-        BigDecimal lng = new BigDecimal(
-                new String(longitude.getBytes(), StandardCharsets.UTF_8).trim());
+
         // خزّنِ الصورة في Volume: /app/uploads
         String filename = null;
         if (image != null && !image.isEmpty()) {
             Path uploadDir = Paths.get(System.getenv()
                 .getOrDefault("RAILWAY_VOLUME_MOUNT_PATH", "/app/uploads"));
             Files.createDirectories(uploadDir);
-            
+
             filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
             image.transferTo(uploadDir.resolve(filename));
         }
-        PlaceRequest dto = new PlaceRequest(name, description, category, lat, lng);
+        PlaceRequest dto = new PlaceRequest(name, description, category, latitude, longitude);
 
         Place place = new Place(
                 null,                 // ID will be auto-generated
                 name,
                description,
-                lat,
-               lng,
+                latitude,
+                longitude,
                 filename,
                 null,                // createdAt will be auto-generated
                 category,
@@ -86,7 +83,7 @@ public class PlaceController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new PlaceRequest(name, description,
-                        category, lat, lng));
+                        category, latitude, longitude));
     }
 
     // DELETE /api/place/{placeId}

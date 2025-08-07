@@ -58,11 +58,12 @@ public class PlaceController {
         BigDecimal lng = new BigDecimal(
                 new String(longitude.getBytes(), StandardCharsets.UTF_8).trim());
         // خزّنِ الصورة في Volume: /app/uploads
-        Path uploadDir = Paths.get(System.getenv()
-                .getOrDefault("RAILWAY_VOLUME_MOUNT_PATH", "/app/uploads"));
-        Files.createDirectories(uploadDir);
         String filename = null;
         if (image != null && !image.isEmpty()) {
+            Path uploadDir = Paths.get(System.getenv()
+                .getOrDefault("RAILWAY_VOLUME_MOUNT_PATH", "/app/uploads"));
+            Files.createDirectories(uploadDir);
+            
             filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
             image.transferTo(uploadDir.resolve(filename));
         }

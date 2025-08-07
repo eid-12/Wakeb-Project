@@ -160,10 +160,13 @@ const data = await searchPlace(q, {
 const selectResult =  (feature) => {
   selectedResult.value = feature;    
   emit('removeResult');
-    // await searchpo(feature.place_name);   
+    addselectResult(feature.place_name);   
     emit('plotResult', feature.geometry);
 };
 
+const  addselectResult = async  (feature) => {
+ await searchpo(feature.place_name);   
+};
 
 const removeResults = () => {
   selectedResult.value = null;

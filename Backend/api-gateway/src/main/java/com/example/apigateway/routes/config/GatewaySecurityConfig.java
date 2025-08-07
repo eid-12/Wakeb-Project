@@ -48,7 +48,7 @@ public class GatewaySecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Allow public access to authentication endpoints
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/error","/auth/**").permitAll()
 
                         // Require authentication for any /api/place/** endpoint
                         .requestMatchers("/api/place/** " ).authenticated()

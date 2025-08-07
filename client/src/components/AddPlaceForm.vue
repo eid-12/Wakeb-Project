@@ -126,7 +126,7 @@ const res = await submitPlac(form)
     });
     resetForm()
   } catch (err) {
-    console.error(err)
+    console.error(err);
     showAlert({
       type: 'danger',
       title: 'Error',

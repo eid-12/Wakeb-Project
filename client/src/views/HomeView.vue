@@ -234,52 +234,25 @@ function plotResult(resultCoords) {
   closeSearchResults();
 }
 
-function addRoute() {
-  if (!coords.value) {
-    showAlert({
-      type: 'warning',
-      title: 'Location Service Disabled',
-      message: 'Please enable location (GPS) on your device to display the route.'
-    });
-    return;                       
-  }
-
-  setTimeout(() => {
-    removeRoute();                
-
-    const start = coords.value;
-    const end   = dest;           
-
+function addRoute() { 
+  if (coords.value) {
+     setTimeout(() => {
+  removeRoute();
+  let start =coords.value;
+  let end= dest;
     routeControl.value = leaflet.Routing.control({
-      waypoints: [
-        leaflet.latLng(start.lat, start.lng),
-        leaflet.latLng(end.lat,   end.lng)
-      ],
-      lineOptions: { styles: [{ color: 'green', weight: 4 }] },
-      createMarker: () => null,
-      addWaypoints: false,
+      waypoints         : [leaflet.latLng(start.lat, start.lng), leaflet.latLng(end.lat, end.lng)],
+      lineOptions       : { styles: [{ color: 'green',weight: 4 }] },
+      createMarker      : () => null,
+      addWaypoints      : false,
       draggableWaypoints: false,
-      fitSelectedRoutes: true
-    })
-    .on('routingerror', () => { 
-      showAlert({
-        type: 'error',
-        title: 'Route Unavailable',
-        message: 'No route could be found between the selected points.'
-      });
-    })
-    .on('routesfound', e => {   
-      if (!e.routes || e.routes.length === 0) {
-        showAlert({
-          type: 'error',
-          title: 'Route Unavailable',
-          message: 'No route could be found between the selected points.'
-        });
-      }
-    })
-    .addTo(map);
-
-  }, 500);
+      fitSelectedRoutes : true
+    }).addTo(map);
+    }, 500);
+    }  
+    else{
+    showAlert({ type: 'warning', title: 'Location Service Disabled ', message: 'Please enable location (GPS) on your device to display the route.' });
+    }
 }
 
 function removeRoute() {

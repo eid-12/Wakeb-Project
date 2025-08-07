@@ -50,8 +50,8 @@ public class PlaceController {
             @RequestPart("name")    String name,
             @RequestPart("description") String description,
             @RequestPart("category")    String category,
-            @RequestPart("latitude")    MultipartFile latitude,
-            @RequestPart("longitude") MultipartFile longitude
+            @RequestPart(value = "latitude" , required = false)    MultipartFile latitude,
+            @RequestPart(value = "longitude" , required = false) MultipartFile longitude
     ) throws IOException {
         BigDecimal lat = new BigDecimal(
                 new String(latitude.getBytes(), StandardCharsets.UTF_8).trim());

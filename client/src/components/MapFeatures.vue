@@ -158,14 +158,10 @@ const data = await searchPlace(q, {
 };
 
 const selectResult = async (feature) => {
-  selectedResult.value = feature;
-  try {
+  selectedResult.value = feature;    
+  emit('removeResult');
     await searchpo(feature.place_name);   
-    emit('removeResult');
     emit('plotResult', feature.geometry);
-  } catch (err) {
-    console.error('search failed:', err);
-  }
 };
 
 

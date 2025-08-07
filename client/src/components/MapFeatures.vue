@@ -157,10 +157,10 @@ const data = await searchPlace(q, {
   }, 750);
 };
 
-const selectResult = async (feature) => {
+const selectResult =  (feature) => {
   selectedResult.value = feature;    
   emit('removeResult');
-    await searchpo(feature.place_name);   
+    // await searchpo(feature.place_name);   
     emit('plotResult', feature.geometry);
 };
 

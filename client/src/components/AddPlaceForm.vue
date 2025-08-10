@@ -16,7 +16,11 @@
           <input required  v-model="place.latitude" placeholder="Latitude" class="input" />
           <input required  v-model="place.longitude" placeholder="Longitude" class="input" />
         </div>
-        <input type="file" @change="handleImageUpload" class="input-file" />
+        <input ref="fileInput" type="file" @change="handleImageUpload" class="input-file" accept="image/*"/>
+        <div v-if="imageFile" class="text-sm mt-2 flex items-center gap-3">
+        <span>{{ imageFile.name }} ({{ Math.round(imageFile.size/1024) }} KB)</span>
+        <button type="button" @click="clearImage" class="text-red-600 underline">Remove</button>
+      </div>
         <textarea v-model="place.notes" placeholder="Optional Notes" rows="2" class="input"></textarea>
         <div class="flex justify-end gap-3 pt-4">
           <button type="button" @click="resetForm" class="btn-cancel">Cancel</button>
@@ -41,6 +45,7 @@
             <h3 class="font-semibold">{{ p.name }}</h3>
             <p class="text-sm text-gray-500">{{ p.description }}</p>
             <p class="text-xs text-gray-400 mt-1">{{ p.latitude }}, {{ p.longitude }}</p>
+            
           </div>
           <div class="flex flex-col gap-2 shrink-0">
             <button @click="$emit('view', p)" class="btn-view">View in Map</button>

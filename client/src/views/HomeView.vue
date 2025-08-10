@@ -70,6 +70,7 @@
     @view="flyTo"
     />
     <SettingsPanel
+       v-if="selectedMenu === 'settings'"
   :selected-menu="selectedMenu"
   @change-menu="selectedMenu = $event"
   @logout = "logout"
@@ -79,8 +80,7 @@
 />
 <SearchHistoryPanel   v-if= "selectedMenu ==='history'" />
 
-        <!-- Map features overlay        v-if="selectedMenu === 'settings'"
--->
+        <!-- Map features overlay -->
         <div v-if="selectedMenu === 'map'" class="search-overlay">
           <MapFeatures
             @toggleSearchResults="toggleSearchResults"

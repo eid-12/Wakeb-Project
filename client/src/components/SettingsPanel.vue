@@ -182,7 +182,6 @@ const { showAlert, showConfirm } = useAlerts();
 const emit = defineEmits(["change-menu","logout"]);
 
 
-logout
 const settings = reactive({
   language: 'English',
   theme: 'Light',

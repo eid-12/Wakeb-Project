@@ -179,7 +179,8 @@ import {
 import { useAlerts } from '@/composables/useAlerts';
 
 const { showAlert, showConfirm } = useAlerts();
-const emit = defineEmits(['change-menu','logout']);
+const emit = defineEmits(["change-menu","logout"]);
+
 
 logout
 const settings = reactive({

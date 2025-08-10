@@ -35,7 +35,7 @@
 <script setup>
 /* global defineProps, defineEmits */
 import { ref, onMounted} from 'vue'
-import {fetchSearchHistory,clearSearchHistory} from '@/api/user'
+import { fetchSearchHistory , clearSearchHistory} from '@/api/user'
 const props = defineProps({
 
   newQuery: {

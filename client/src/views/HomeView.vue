@@ -73,6 +73,7 @@
        v-if="selectedMenu === 'settings'"
   :selected-menu="selectedMenu"
   @change-menu="selectedMenu = $event"
+  @logout = "logout"
 />
     <AdminPanel
        v-if="selectedMenu === 'admin'"
@@ -307,6 +308,7 @@ setTimeout(() => { showNavbarSuccess.value = false }, 4000);
 }
 
 function logout() {
+  deleteTokenCookie() ;
   clearUser();
   loginPanelRef.value?.logoutUser?.()
 removeResultsRef.value?.removeResults?.()

@@ -67,7 +67,7 @@
 /* global defineEmits defineExpose */  
 import { ref ,reactive} from 'vue';
 import { useAlerts } from '@/composables/useAlerts';
-import { registerUser, loginUser, getUser, useUser } from '@/api/user'
+import { registerUser, loginUser, getUser, useUser ,deleteTokenCookie } from '@/api/user'
 
 const { showAlert, showConfirm } = useAlerts();
 const { setUser, clearUser } = useUser();
@@ -99,6 +99,7 @@ function toggleMode() {
   resetForm();
 }
  function logoutUser() {
+  deleteTokenCookie();
   clearUser();
   localStorage.removeItem('savedPlaces');
   sessionStorage.removeItem('coords');

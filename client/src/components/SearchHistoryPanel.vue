@@ -46,16 +46,6 @@ const props = defineProps({
 
 const history = ref([])
 
-function formatTS(iso) {
-  return new Date(iso).toLocaleString('en-US', {
-    month: 'short',
-    day: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-  })
-}
 
 async function fetchHistory() {
   try {

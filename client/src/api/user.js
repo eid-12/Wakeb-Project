@@ -94,6 +94,14 @@ export function useUser() {
   return { user, setUser, clearUser };
 }
 
+export function deleteTokenCookie() {
+  // لو كان متسجل على الدومين الأعلى (زي .up.railway.app)
+  document.cookie = "token=; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.up.railway.app";
+  // احتياط لو انحفظ بدون domain (على نفس الساب دومين maps.up.railway.app)
+  document.cookie = "token=; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+}
+
+
 
 export const searchPlace = async (query, params) => {
   try {

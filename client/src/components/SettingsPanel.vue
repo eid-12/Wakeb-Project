@@ -179,8 +179,9 @@ import {
 import { useAlerts } from '@/composables/useAlerts';
 
 const { showAlert, showConfirm } = useAlerts();
-const emit = defineEmits(['change-menu']);
+const emit = defineEmits(['change-menu','logout']);
 
+logout
 const settings = reactive({
   language: 'English',
   theme: 'Light',
@@ -317,8 +318,7 @@ async function deleteAccount() {
   try {
     await deleteUser(user.value.id);
     showAlert({ type: 'success', title: 'Deleted', message: 'Account deleted successfully' });
-    localStorage.clear();
-    window.location.href = '/';
+      emit('logout');
   } catch (e) {
     showAlert({ type: 'danger', title: 'Error', message: e.response?.data?.message || 'An error occurred while deleting the account' });
   } finally {

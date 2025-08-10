@@ -158,16 +158,12 @@ const data = await searchPlace(q, {
 };
 
 const selectResult = async (feature) => {
-  // خزّن النتيجة المختارة
   selectedResult.value = feature;
 
-  // احذف النتائج المعروضة
   emit('removeResult');
 
-  // ارسم الموقع على الخريطة
   emit('plotResult', feature.geometry);
 
-  // نفّذ البحث (تأكد أنه موجود)
   if (feature?.place_name) {
     await searchpo(feature.place_name);
   } else {
@@ -176,9 +172,6 @@ const selectResult = async (feature) => {
 };
 
 
-// const  addselectResult = async  (feature) => {
-//  await searchpo(feature);   
-// };
 
 const removeResults = () => {
   selectedResult.value = null;

@@ -43,51 +43,48 @@ public class PlaceController {
 
     // POST /api/place
     // Adds a new place for the current user
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE ,value = "/places")
-    public ResponseEntity<?>  add(
-            @RequestHeader("X-User-Id") int userId,
-            @RequestPart(value="image" ,    required=false) MultipartFile image,
-            @RequestPart("name")    String name,
-            @RequestPart("description") String description,
-            @RequestPart("category")    String category,
-            @RequestPart(value = "latitude" , required = false)    MultipartFile latitude,
-            @RequestPart(value = "longitude" , required = false) MultipartFile longitude
+    @PostMapping(value = "/places", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> add(
+            @RequestHeader(value = "X-User-Id", required = false) Integer userId,
+            @RequestParam("name")        String name,
+            @RequestParam("description") String description,
+            @RequestParam("category")    String category,
+            @RequestParam("latitude")    BigDecimal latitude,
+            @RequestParam("longitude")   BigDecimal longitude,
+            @RequestPart(value = "image", required = false) MultipartFile image
     ) throws IOException {
-        BigDecimal lat = new BigDecimal(
-                new String(latitude.getBytes(), StandardCharsets.UTF_8).trim());
-        BigDecimal lng = new BigDecimal(
-                new String(longitude.getBytes(), StandardCharsets.UTF_8).trim());
-        // خزّنِ الصورة في Volume: /app/uploads
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing X-User-Id");
+        }
+
         String filename = null;
         if (image != null && !image.isEmpty()) {
             Path uploadDir = Paths.get(System.getenv()
-                .getOrDefault("RAILWAY_VOLUME_MOUNT_PATH", "/app/uploads"));
+                    .getOrDefault("RAILWAY_VOLUME_MOUNT_PATH", "/app/uploads"));
             Files.createDirectories(uploadDir);
 
             filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
             image.transferTo(uploadDir.resolve(filename));
         }
-        PlaceRequest dto = new PlaceRequest(name, description, category, lat, lng);
 
         Place place = new Place(
-                null,                 // ID will be auto-generated
+                null,
                 name,
-               description,
-                lat,
-               lng,
+                description,
+                latitude,
+                longitude,
                 filename,
-                null,                // createdAt will be auto-generated
+                null,
                 category,
                 userId
         );
         Place saved = placeRepo.save(place);
 
-//        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new PlaceRequest(name, description,
-                        category, lat, lng));
+        // رجّعي الشي اللي تحتاجه الواجهة (مثلاً الـ id)
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
+
 
     // DELETE /api/place/{placeId}
     // Deletes a specific place by its ID for the current user

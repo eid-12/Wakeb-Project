@@ -105,12 +105,14 @@ async function submitPlace() {
     return;
   }
 //  FormData
-  const form = new FormData()
-  form.append('name',         place.value.name)
-  form.append('description',  place.value.description)
-  form.append('category',     place.value.category)
-  form.append('latitude',     place.value.latitude)
-  form.append('longitude',    place.value.longitude)
+const form = new FormData();
+form.append('name', place.value.name);
+form.append('description', place.value.description);
+form.append('category', place.value.category);
+form.append('latitude', String(place.value.latitude));
+form.append('longitude', String(place.value.longitude));
+if (imageFile.value) form.append('image', imageFile.value);
+
   if (imageFile.value) {
     form.append('image', imageFile.value)   
   }

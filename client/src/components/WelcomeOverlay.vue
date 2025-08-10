@@ -12,8 +12,7 @@
         During my summer training at <strong>Wakeb Data</strong> in Riyadh, I worked on
         <strong>Wakeb Maps</strong>, an interactive web mapping system that combines a Vue.js + Leaflet
         front end with Spring Boot microservices to process data and expose REST APIs. We secured the
-        platform with JWT and Spring Security for role- and permission-based access, and built a JavaFX
-        desktop client that shares the same API contracts. The stack was containerized with Docker for
+        platform with JWT and Spring Security for role- and permission-based access. The stack was containerized with Docker for
         easier deployment, and Postman was used to validate integration across services.
       </p>
 

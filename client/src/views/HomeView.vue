@@ -134,7 +134,7 @@ import SavedPlacesPanel   from '@/components/SavedPlacesPanel.vue';
 import SearchHistoryPanel from '@/components/SearchHistoryPanel.vue';
 import AdminPanel from '@/components/AdminPanel.vue';
 import WelcomeOverlay from '@/components/WelcomeOverlay.vue'
-import { useUser ,getUser } from '@/api/user';
+import { useUser ,getUser ,deleteTokenCookie} from '@/api/user';
 import { useAlerts } from '@/composables/useAlerts';
 /*************************
  * Reactive state

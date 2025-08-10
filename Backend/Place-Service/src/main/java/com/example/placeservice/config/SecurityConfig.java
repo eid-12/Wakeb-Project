@@ -17,7 +17,7 @@ public class SecurityConfig {
     SecurityFilterChain filter(HttpSecurity http) throws Exception {
         return http
                 // Disable CSRF protection (suitable for stateless REST APIs)
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/place/places", "/app/uploads/**"))
 
                 // Enable default CORS settings (allows frontend apps to communicate)
                 .cors(withDefaults())

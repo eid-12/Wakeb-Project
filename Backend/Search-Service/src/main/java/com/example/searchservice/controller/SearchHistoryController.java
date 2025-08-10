@@ -20,8 +20,10 @@ public class SearchHistoryController {
 
     // Add a new search history entry for a user
     @PostMapping
-    public SearchHistoryResponse add(@RequestHeader("X-User-Id") int userId,
-                                     @RequestBody @Valid SearchHistoryRequest body) {
+    public SearchHistoryResponse add(
+            @RequestHeader(value = "X-User-Id", required = false) Integer userId,
+            @RequestBody @Valid SearchHistoryRequest body
+    ) {
         if (userId == null) {
             throw new org.springframework.web.server.ResponseStatusException(
                     org.springframework.http.HttpStatus.BAD_REQUEST,
@@ -30,7 +32,6 @@ public class SearchHistoryController {
         }
         return service.add(userId, body);
     }
-
     // Delete a specific search history entry by ID
     @DeleteMapping("/{entryId}")
     public void removeOne(@RequestHeader("X-User-Id") int userId,

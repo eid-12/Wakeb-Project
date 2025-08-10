@@ -22,6 +22,12 @@ public class SearchHistoryController {
     @PostMapping
     public SearchHistoryResponse add(@RequestHeader("X-User-Id") int userId,
                                      @RequestBody @Valid SearchHistoryRequest body) {
+        if (userId == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Missing X-User-Id header"
+            );
+        }
         return service.add(userId, body);
     }
 

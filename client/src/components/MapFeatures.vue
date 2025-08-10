@@ -72,7 +72,7 @@
 
 import { ref, onUnmounted } from "vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
-import { searchPlace ,searchpo } from '@/api/user.js'; 
+import { searchPlace , searchpo } from '@/api/user.js'; 
 
 const props = defineProps({
   fetchCoords: Boolean,
@@ -157,16 +157,28 @@ const data = await searchPlace(q, {
   }, 750);
 };
 
-const selectResult =  (feature) => {
-  selectedResult.value = feature;    
+const selectResult = async (feature) => {
+  // خزّن النتيجة المختارة
+  selectedResult.value = feature;
+
+  // احذف النتائج المعروضة
   emit('removeResult');
-    addselectResult(feature.place_name);   
-    emit('plotResult', feature.geometry);
+
+  // ارسم الموقع على الخريطة
+  emit('plotResult', feature.geometry);
+
+  // نفّذ البحث (تأكد أنه موجود)
+  if (feature?.place_name) {
+    await searchpo(feature.place_name);
+  } else {
+    console.warn('place_name NO esixt feature', feature);
+  }
 };
 
-const  addselectResult = async  (feature) => {
- await searchpo(feature.place_name);   
-};
+
+// const  addselectResult = async  (feature) => {
+//  await searchpo(feature);   
+// };
 
 const removeResults = () => {
   selectedResult.value = null;

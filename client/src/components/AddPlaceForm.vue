@@ -83,6 +83,7 @@ const place = ref({
 })
 
 const imageFile = ref(null)
+const fileInput = ref(null)
 const places = ref([])
 const displayLimit = ref(3); // Show 5 places initially
 
@@ -91,13 +92,16 @@ const limitedPlaces = computed(() => places.value.slice(0, displayLimit.value));
 function handleImageUpload(e) {
   imageFile.value = e.target.files[0] || null
 }
-
+function clearImage() {
+  imageFile.value = null
+  if (fileInput.value) fileInput.value.value = null
+}
 function resetForm() {
   place.value = {
     name: '', description: '', category: '',
     latitude: '', longitude: '', notes: '', image: ''
   }
-  imageFile.value = null
+  clearImage()
 }
 
 async function submitPlace() {

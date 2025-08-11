@@ -22,10 +22,10 @@ An advanced full-stack web mapping application that allows users to save places,
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/your-repo.git
+git clone https://github.com/eid-12/Wakeb-Project.git
 
 # Navigate to frontend
-cd frontend
+cd client
 npm install
 
 # Navigate to backend

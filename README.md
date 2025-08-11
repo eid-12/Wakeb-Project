@@ -10,15 +10,6 @@ An advanced full-stack web mapping application that allows users to save places,
 * ⚙ **Settings Page** — Manage language, theme, notifications, privacy, and account information
 * 🛠 **Admin Dashboard** — Manage users, toggle roles, reset passwords, and delete accounts
 
-## 🖼 Screenshots
-
-| Map & Save Place         | Add Unlisted Place                   | Settings                           |
-| ------------------------ | ------------------------------------ | ---------------------------------- |
-| ![Map](./images/map.png) | ![Add Place](./images/add_place.png) | ![Settings](./images/settings.png) |
-
-| Admin Dashboard              |
-| ---------------------------- |
-| ![Admin](./images/admin.png) |
 
 ## 🛠 Tech Stack
 

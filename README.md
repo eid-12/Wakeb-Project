@@ -2,6 +2,11 @@
 
 An advanced full-stack web mapping application that allows users to save places, track search history, add custom locations, and manage content via an admin dashboard.
 
+## 🌐 Live Demo  
+[🔗 Click here to try the application](https://maps.up.railway.app)  
+*📌 Recommended to open on desktop or tablet for the best experience.*
+
+
 ## 📌 Features
 
 * 📍 **Save Favorite Places** — Easily bookmark locations for quick access

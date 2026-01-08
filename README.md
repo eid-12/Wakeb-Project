@@ -3,7 +3,7 @@
 An advanced full-stack web mapping application that allows users to save places, track search history, add custom locations, and manage content via an admin dashboard.
 
 ## 🌐 Live Demo  
-[🔗 Click here to try the application](https://maps.up.railway.app)  
+[🔗 Click here to try the application](https://maps.cloudbase.website)  
 *📌 Recommended to open on desktop or tablet for the best experience.*
 
 
@@ -20,7 +20,7 @@ An advanced full-stack web mapping application that allows users to save places,
 
 * **Frontend:** Vue 3, Leaflet.js
 * **Backend:** Spring Boot, MySQL
-* **Hosting:** Railway
+* **Hosting:** Cloudflare Tunnel
 * **Authentication:** JWT Auth
 
 ## 🚀 Installation
@@ -40,7 +40,7 @@ mvn install
 
 ## ▶ Usage
 
-* Run backend server on port `8080`
+* Run backend server on port `3000`
 * Run frontend development server on port `5173`
 * Open in browser and start exploring the map
 

@@ -1,0 +1,74 @@
+name: Full Stack Microservices CI/CD
+
+on:
+  push:
+    branches: [ "main" ] # سيبدأ العمل عند كل Push لفرع main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }} # يجب أن يكون minipcer
+          password: ${{ secrets.DOCKERHUB_TOKEN }} # التوكن الذي استخرجته
+
+      # 1. بناء ورفع الواجهة الأمامية
+      - name: Build Frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./client
+          file: ./client/dockerfile.bak # استخدام الملف المتاح حالياً
+          push: true
+          tags: minipcer/mapping-frontend:latest
+
+      # 2. بناء ورفع API Gateway
+      - name: Build API Gateway
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Backend/api-gateway
+          push: true
+          tags: minipcer/api-gateway:latest
+
+      # 3. بناء ورفع Auth Service
+      - name: Build Auth Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Backend/Auth-Service
+          push: true
+          tags: minipcer/auth-service:latest
+
+      # 4. بناء ورفع User Service
+      - name: Build User Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Backend/User-Service
+          push: true
+          tags: minipcer/user-service:latest
+
+      # 5. بناء ورفع Search Service
+      - name: Build Search Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Backend/Search-Service
+          push: true
+          tags: minipcer/search-service:latest
+
+      # 6. بناء ورفع Place Service
+      - name: Build Place Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Backend/Place-Service
+          push: true
+          tags: minipcer/place-service:latest
+
+      # 7. بناء ورفع SavedPlace Service
+      - name: Build SavedPlace Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Backend/SavedPlace-Service
+          push: true
+          tags: minipcer/savedplace-service:latest

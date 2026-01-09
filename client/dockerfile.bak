@@ -5,6 +5,13 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+
+# أضف هذه الأسطر هنا لتحديث الروابط أثناء البناء
+ARG VUE_APP_API_GATEWAY_URL
+ARG VUE_APP_AUTH_API_URL
+ENV VUE_APP_API_GATEWAY_URL=$VUE_APP_API_GATEWAY_URL
+ENV VUE_APP_AUTH_API_URL=$VUE_APP_AUTH_API_URL
+
 RUN node -v && npm -v && pwd && ls -la && ls -la public || true
 RUN test -f public/index.html || (echo "❌ public/index.html missing" && exit 1)
 RUN npm run build --verbose

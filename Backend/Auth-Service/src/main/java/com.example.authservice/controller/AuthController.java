@@ -38,7 +38,7 @@ public class AuthController {
                 .maxAge(60 * 60 * 2)
                 .secure(false)// Change to true in production
                 .sameSite("Strict")
-                .domain("up.railway.app")
+                .domain("cloudbase.website")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
@@ -56,7 +56,7 @@ public class AuthController {
                 .maxAge(60 * 60 * 2)
                 .secure(false)// Change to true in production
                 .sameSite("Strict")
-                .domain("up.railway.app")
+                .domain("cloudbase.website")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
@@ -71,7 +71,7 @@ public class AuthController {
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(0) // يحذف فوراً
-                .domain("up.railway.app")
+                .domain("cloudbase.website")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
         return ResponseEntity.ok().build();

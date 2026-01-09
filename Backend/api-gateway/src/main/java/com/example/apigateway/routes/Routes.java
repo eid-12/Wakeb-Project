@@ -25,7 +25,7 @@ public class Routes {
                 .build();
     }
 
-    // Routes Swagger documentation requests for user service
+    // Routes Swagger documentation requests for user servic
     @Bean
     public RouterFunction<ServerResponse> userServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("User-Service_Swagger")

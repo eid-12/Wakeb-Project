@@ -22,7 +22,7 @@ public class CorsConfig {
         config.setAllowCredentials(true); // Allow cookies and credentials in cross-origin requests
 
         // Allow frontend running on localhost:8080
-        config.setAllowedOriginPatterns(List.of("http://localhost:8080", "http://192.168.110.211:8080","https://maps.up.railway.app"));
+        config.setAllowedOriginPatterns(List.of("http://localhost:80", "https://maps.cloudbase.website", "http://localhost:3000"));
 
         // Allow common HTTP methods
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

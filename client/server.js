@@ -3,17 +3,20 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
 const app = express();
 
-// إعدادات البروكسي لخدمة الأوثنتيكيشن
+// 1. تفعيل قراءة بيانات الـ JSON (ضروري جداً لاستلام بيانات التسجيل والدخول)
+app.use(express.json());
+
+// 2. إعدادات البروكسي لخدمة الأوثنتيكيشن
 app.use('/api/auth', createProxyMiddleware({
-    // استخدام الاسم الكامل الذي نجح في اختبار curl
+    // استخدام الاسم الكامل المكتشف في اختبار curl
     target: 'http://wakeb-application-auth-service-1:8080', 
     changeOrigin: true,
-    // زيادة وقت الانتظار لتجنب خطأ 504 أثناء معالجة البيانات
+    // معالجة وقت الانتظار لتجنب خطأ 504
     proxyTimeout: 20000, 
     timeout: 20000,
-    // التأكد من تمرير رؤوس الطلب الأصلية (مهم لـ Spring Security)
+    // تمرير البيانات (Body) بشكل يدوي لضمان وصولها لـ Spring Boot
     onProxyReq: (proxyReq, req, res) => {
-        if (req.body) {
+        if (req.body && Object.keys(req.body).length > 0) {
             const bodyData = JSON.stringify(req.body);
             proxyReq.setHeader('Content-Type', 'application/json');
             proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
@@ -24,18 +27,27 @@ app.use('/api/auth', createProxyMiddleware({
     pathRewrite: { '^/api/auth': '/api/auth' } 
 }));
 
-// إعدادات البروكسي للجيت واي
+// 3. إعدادات البروكسي للجيت واي
 app.use('/api', createProxyMiddleware({
     target: 'http://wakeb-application-api-gateway-1:8080',
     changeOrigin: true,
     proxyTimeout: 20000,
-    timeout: 20000
+    timeout: 20000,
+    // تمرير البيانات أيضاً للجيت واي في حال وجود طلبات POST/PUT
+    onProxyReq: (proxyReq, req, res) => {
+        if (req.body && Object.keys(req.body).length > 0) {
+            const bodyData = JSON.stringify(req.body);
+            proxyReq.setHeader('Content-Type', 'application/json');
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+            proxyReq.write(bodyData);
+        }
+    }
 }));
 
-// تقديم الملفات الثابتة للفرونت إند
+// 4. تقديم الملفات الثابتة للفرونت إند (Vue.js)
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// توجيه أي مسار آخر لملف index.html (لدعم Vue Router)
+// 5. دعم Vue Router (توجيه كافة المسارات لـ index.html)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });

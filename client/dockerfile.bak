@@ -3,7 +3,7 @@
 FROM node:18-bullseye AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 
 # أضف هذه الأسطر هنا لتحديث الروابط أثناء البناء

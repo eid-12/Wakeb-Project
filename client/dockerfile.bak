@@ -1,11 +1,12 @@
+# المرحلة الأولى: بناء تطبيق Vue
 FROM node:18-bullseye AS build
 WORKDIR /app
 COPY package*.json ./
-# نستخدم install لتحديث الـ lock file تلقائياً
+# استخدمنا install لتحديث ملف الـ Lock تلقائياً أثناء البناء
 RUN npm install 
 COPY . .
 
-# متغيرات البيئة للـ Build
+# حقن المتغيرات (ستكون قيمتها /api و /api/auth كما اتفقنا)
 ARG VUE_APP_API_GATEWAY_URL
 ARG VUE_APP_AUTH_API_URL
 ENV VUE_APP_API_GATEWAY_URL=$VUE_APP_API_GATEWAY_URL
@@ -13,25 +14,21 @@ ENV VUE_APP_AUTH_API_URL=$VUE_APP_AUTH_API_URL
 
 RUN npm run build --verbose
 
-# المرحلة النهائية
+# المرحلة الثانية: تشغيل الخادم (البروكسي)
 FROM node:18-bullseye
 WORKDIR /app
-
-# نسخ ملفات التعريف أولاً
 COPY package*.json ./
 
-# تثبيت جميع المكتبات (بما فيها البروكسي) بشكل صريح
+# التعديل الحاسم: تثبيت مكتبات التشغيل (express و proxy) بشكل مؤكد
 RUN npm install --production
 
-# نسخ ملف الخادم وتأكد من وجوده في نفس المسار
-COPY server.js ./
-
-# نسخ ملفات الواجهة المبنيه
+# نسخ الملفات المطلوبة للتشغيل
+COPY server.js ./server.js
 COPY --from=build /app/dist ./dist
 
+# إعدادات البيئة
 ENV PORT=3000
 ENV NODE_ENV=production
 EXPOSE 3000
 
-# تشغيل الخادم
 CMD ["node", "server.js"]

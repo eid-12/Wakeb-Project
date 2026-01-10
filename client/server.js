@@ -5,14 +5,14 @@ const app = express();
 
 app.use('/api/auth', createProxyMiddleware({
     // نستخدم اسم الحاوية الموضح في Docker Desktop
-    target: 'http://auth-service-1:8080', 
+    target: 'http://wakeb-application-auth-service-1:8080', 
     changeOrigin: true,
     // تأكد من بقاء المسار كما هو /api/auth/login
     pathRewrite: { '^/api/auth': '/api/auth' } 
 }));
 
 app.use('/api', createProxyMiddleware({
-    target: 'http://api-gateway-1:8080',
+    target: 'http://wakeb-application-api-gateway-1:8080',
     changeOrigin: true,
 }));
 

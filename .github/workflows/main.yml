@@ -24,8 +24,8 @@ jobs:
           push: true
           tags: minipcer/mapping-frontend:latest
           build-args: |
-            VUE_APP_API_GATEWAY_URL=https://maps.cloudbase.website/api
-            VUE_APP_AUTH_API_URL=https://maps.cloudbase.website/api/auth
+            VUE_APP_API_GATEWAY_URL=/api
+            VUE_APP_AUTH_API_URL=/api/auth
             
       - name: Build API Gateway
         uses: docker/build-push-action@v4

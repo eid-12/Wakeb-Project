@@ -52,6 +52,8 @@ public class AuthController {
         String token = authService.login(request).token(); // Get only the token
 
 
+
+
         ResponseCookie cookie = ResponseCookie.from("token", token)
 
 
@@ -84,6 +86,7 @@ public class AuthController {
         response.addHeader("Set-Cookie", cookie.toString());
         return ResponseEntity.ok().build();
     }
+
 
 
     // Handle runtime exceptions with a 400 Bad Request response
@@ -128,5 +131,5 @@ public class AuthController {
 
         return ResponseEntity.ok("Password updated");
     }
-}
+    }
 

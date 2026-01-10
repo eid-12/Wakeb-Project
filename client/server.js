@@ -3,28 +3,22 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
 const app = express();
 
-// 1. تفعيل قراءة بيانات الـ JSON (ضروري جداً لاستلام بيانات التسجيل والدخول)
+// ضروري جداً لقراءة البيانات القادمة من المتصفح
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// 2. إعدادات البروكسي لخدمة الأوثنتيكيشن
 app.use('/api/auth', createProxyMiddleware({
-    // استخدام الاسم الكامل المكتشف في اختبار curl
     target: 'http://wakeb-application-auth-service-1:8080', 
     changeOrigin: true,
-    // معالجة وقت الانتظار لتجنب خطأ 504
-    proxyTimeout: 20000, 
-    timeout: 20000,
-    // تمرير البيانات (Body) بشكل يدوي لضمان وصولها لـ Spring Boot
     onProxyReq: (proxyReq, req, res) => {
-        if (req.body && Object.keys(req.body).length > 0) {
+        // إذا كان هناك جسم للطلب، قم بكتابته يدوياً في طلب البروكسي
+        if (req.body && Object.keys(req.body).length) {
             const bodyData = JSON.stringify(req.body);
             proxyReq.setHeader('Content-Type', 'application/json');
             proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
             proxyReq.write(bodyData);
         }
-    },
-    // المسار يبقى كما هو لأن الكنترولر يبدأ بـ /api/auth
-    pathRewrite: { '^/api/auth': '/api/auth' } 
+    }
 }));
 
 // 3. إعدادات البروكسي للجيت واي

@@ -18,73 +18,66 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-@Configuration // Marks this class as a Spring configuration
-@EnableWebSecurity // Enables Spring Security
-@RequiredArgsConstructor // Injects final fields via constructor
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
 
-    // Bean for password encoding using BCrypt
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Provides AuthenticationManager for login/authentication operations
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // Main security configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(withDefaults()) // Enable CORS with custom config
-                .csrf(csrf -> csrf.disable()) // Disable CSRF (for stateless APIs)
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No session (JWT used)
-
+                .cors(withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Allow unauthenticated access to auth endpoints (e.g. /login, /register)
+                        // 1. السماح بمرور طلبات الأوثنتيكيشن
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                        // Allow access to Swagger and API docs
-                        .requestMatchers("/swagger-ui/**", "/v3/**", "/webjars/**", "/swagger-ui.html", "/api/auth/**").permitAll()
-                        // All other requests must be authenticated
+                        // 2. التعديل المهم: السماح بمرور مسار الأخطاء لرؤية السبب الحقيقي (Fix for 403 on /error)
+                        .requestMatchers("/error").permitAll()
+                        // 3. السماح بمرور التوثيق وSwagger
+                        .requestMatchers("/swagger-ui/**", "/v3/**", "/webjars/**", "/swagger-ui.html").permitAll()
+                        // 4. أي طلب آخر يتطلب توثيق
                         .anyRequest().authenticated())
-
-                // Add JWT filter before UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-
-                // Use custom user details service
                 .userDetailsService(userDetailsService)
-
                 .build();
     }
 
-    // CORS configuration for allowing cross-origin requests
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        // السماح لكافة المصادر لضمان قبول طلبات البروكسي الداخلي
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        // استخدام الأنماط للسماح للبروكسي والنطاق الخاص بك
+        configuration.setAllowedOriginPatterns(List.of(
+                "https://maps.cloudbase.website",
+                "http://localhost:3000",
+                "http://wakeb-application-frontend-1:3000"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "X-Forwarded-For"));
         configuration.setExposedHeaders(List.of("Set-Cookie"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }
-// config.setAllowedOriginPatterns(List.of("http://192.168.110.211:8080"));

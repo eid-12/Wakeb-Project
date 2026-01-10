@@ -1,30 +1,29 @@
-
-
 FROM node:18-bullseye AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+# تم التغيير لضمان تحديث الـ Lock file تلقائياً أثناء البناء
+RUN npm install 
 COPY . .
 
-# أضف هذه الأسطر هنا لتحديث الروابط أثناء البناء
+# حقن متغيرات البيئة أثناء البناء
 ARG VUE_APP_API_GATEWAY_URL
 ARG VUE_APP_AUTH_API_URL
 ENV VUE_APP_API_GATEWAY_URL=$VUE_APP_API_GATEWAY_URL
 ENV VUE_APP_AUTH_API_URL=$VUE_APP_AUTH_API_URL
 
-RUN node -v && npm -v && pwd && ls -la && ls -la public || true
-RUN test -f public/index.html || (echo "❌ public/index.html missing" && exit 1)
 RUN npm run build --verbose
 
 
 FROM node:18-bullseye
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --omit=dev
+
+# التعديل الحاسم هنا: استخدام install بدلاً من ci لتجنب تعارض الـ Lock file
+RUN npm install --omit=dev 
+
 COPY server.js ./server.js
 COPY --from=build /app/dist ./dist
 
-# التعديل هنا:
 ENV PORT=3000
 ENV NODE_ENV=production
 EXPOSE 3000

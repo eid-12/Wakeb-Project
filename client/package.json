@@ -16,6 +16,7 @@
     "leaflet-routing-machine": "^3.2.12",
     "sweetalert2": "^11.22.2",
     "vue": "^3.2.13",
+    "http-proxy-middleware": "^3.0.0",
     "vue-router": "^4.0.3"
   },
   "devDependencies": {

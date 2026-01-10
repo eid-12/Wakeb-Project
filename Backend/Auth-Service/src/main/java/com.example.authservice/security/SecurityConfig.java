@@ -75,7 +75,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true); // Allow cookies/credentials
-        configuration.setAllowedOrigins(List.of("http://localhost:80", "https://maps.cloudbase.website", "http://localhost:3000","http://frontend-1:3000")); // Allow all origins
+        configuration.setAllowedOriginPatterns(List.of(
+                "https://maps.cloudbase.website",
+                "http://localhost:3000",
+                "http://frontend-1:3000"
+        )); // Allow all origins
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // Allow these HTTP methods
         configuration.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
 

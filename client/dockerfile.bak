@@ -1,11 +1,11 @@
 FROM node:18-bullseye AS build
 WORKDIR /app
 COPY package*.json ./
-# تم التغيير لضمان تحديث الـ Lock file تلقائياً أثناء البناء
+# نستخدم install لتحديث الـ lock file تلقائياً
 RUN npm install 
 COPY . .
 
-# حقن متغيرات البيئة أثناء البناء
+# متغيرات البيئة للـ Build
 ARG VUE_APP_API_GATEWAY_URL
 ARG VUE_APP_AUTH_API_URL
 ENV VUE_APP_API_GATEWAY_URL=$VUE_APP_API_GATEWAY_URL
@@ -13,19 +13,25 @@ ENV VUE_APP_AUTH_API_URL=$VUE_APP_AUTH_API_URL
 
 RUN npm run build --verbose
 
-
+# المرحلة النهائية
 FROM node:18-bullseye
 WORKDIR /app
+
+# نسخ ملفات التعريف أولاً
 COPY package*.json ./
 
-# التعديل الحاسم هنا: استخدام install بدلاً من ci لتجنب تعارض الـ Lock file
-RUN npm install --omit=dev 
+# تثبيت جميع المكتبات (بما فيها البروكسي) بشكل صريح
+RUN npm install --production
 
-COPY server.js ./server.js
+# نسخ ملف الخادم وتأكد من وجوده في نفس المسار
+COPY server.js ./
+
+# نسخ ملفات الواجهة المبنيه
 COPY --from=build /app/dist ./dist
 
 ENV PORT=3000
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["node","server.js"]
+# تشغيل الخادم
+CMD ["node", "server.js"]

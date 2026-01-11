@@ -10,13 +10,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const fixRequestBody = (proxyReq, req, res) => {
-    if (!req.body || !Object.keys(req.body).length) return;
-
-    const contentType = proxyReq.getHeader('Content-Type');
-    const bodyData = JSON.stringify(req.body);
-
-    if (contentType && contentType.includes('application/json')) {
+    if (req.body && Object.keys(req.body).length) {
+        const bodyData = JSON.stringify(req.body);
+        // تأكد من ضبط الرؤوس قبل الكتابة
+        proxyReq.setHeader('Content-Type', 'application/json');
         proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+        // كتابة البيانات
         proxyReq.write(bodyData);
     }
 };
@@ -27,7 +26,13 @@ app.use('/api/auth', createProxyMiddleware({
 
     pathRewrite: { '^/api/auth': '/api/auth' },
     onProxyReq: fixRequestBody // تأكد من استخدام دالة تمرير البيانات التي برمجناها
-
+proxyTimeout: 120000, // دقيقتين
+    timeout: 120000,
+    on: {
+        proxyErr: (err, req, res) => {
+            console.error('Proxy connection error:', err);
+        }
+    }
 
 
 

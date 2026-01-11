@@ -50,12 +50,29 @@ public class PlaceService {
 
     // Deletes a specific place by ID and user
     @Transactional
-    public void delete(Integer userId, Integer placeId) {
-        Long deleted = placeRepo.deleteByIdAndUserId(placeId, userId);
-        if (deleted == 0) {
-            throw new IllegalArgumentException("Place not found for this user");
+public void delete(Integer userId, Integer placeId) {
+    // 1. جلب بيانات المكان قبل الحذف لمعرفة اسم الملف
+    Place place = placeRepo.findByIdAndUserId(placeId, userId)
+            .orElseThrow(() -> new IllegalArgumentException("Place not found for this user"));
+
+    // 2. تحديد مسار المجلد (استخدام نفس المنطق الموجود في الـ Controller)
+    String uploadPath = System.getenv().getOrDefault("UPLOAD_PATH", "/app/uploads");
+    String filename = place.getFilename();
+
+    // 3. حذف الملف الفعلي من المجلد إذا كان موجوداً
+    if (filename != null && !filename.isEmpty()) {
+        try {
+            Path filePath = Paths.get(uploadPath).resolve(filename);
+            Files.deleteIfExists(filePath); // يحذف الملف من الهاردسك
+        } catch (IOException e) {
+            // سجل الخطأ إذا فشل حذف الملف ولكن استمر في حذف السجل
+            System.err.println("Failed to delete image file: " + filename);
         }
     }
+
+    // 4. الآن نحذف السجل من قاعدة البيانات
+    placeRepo.delete(place);
+}
 
     // Converts a Place entity to a PlaceResponse DTO
     private PlaceResponse map(Place p) {

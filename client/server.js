@@ -1,45 +1,33 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
-const bodyParser = require('body-parser'); // ضروري لمعالجة البيانات
-
 const app = express();
 
-// قراءة بيانات الـ JSON والـ URL-encoded قبل البروكسي
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const fixRequestBody = (proxyReq, req, res) => {
-    if (!req.body || !Object.keys(req.body).length) return;
-
-    const contentType = proxyReq.getHeader('Content-Type');
-    const bodyData = JSON.stringify(req.body);
-
-    if (contentType && contentType.includes('application/json')) {
-        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-        proxyReq.write(bodyData);
-    }
-};
+// ضروري جداً لقراءة بيانات الـ JSON القادمة من المتصفح
+app.use(express.json()); 
 
 app.use('/api/auth', createProxyMiddleware({
     target: 'http://wakeb-application-auth-service-1:8080', 
     changeOrigin: true,
-    // احذف أي سطر يحتوي على pathRewrite إذا كنت ترغب في إرسال المسار كاملاً
-    // أو تأكد أنه يوجه للمسار الصحيح هكذا:
-    pathRewrite: { '^/api/auth': '/api/auth' },
-    onProxyReq: fixRequestBody // تأكد من استخدام دالة تمرير البيانات التي برمجناها
+    onProxyReq: (proxyReq, req, res) => {
+        // إعادة كتابة الجسم (Body) للطلب لضمان وصوله لخدمة الجافا
+        if (req.body) {
+            const bodyData = JSON.stringify(req.body);
+            proxyReq.setHeader('Content-Type', 'application/json');
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+            proxyReq.write(bodyData);
+        }
+    }
 }));
 
 app.use('/api', createProxyMiddleware({
     target: 'http://wakeb-application-api-gateway-1:8080',
-    changeOrigin: true,
-    onProxyReq: fixRequestBody
+    changeOrigin: true
 }));
 
 app.use(express.static(path.join(__dirname, 'dist')));
-
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(3000, () => console.log('✅ Proxy is successfully forwarding with Body data'));
+app.listen(3000, () => console.log('✅ Proxy is up and forwarding requests'));

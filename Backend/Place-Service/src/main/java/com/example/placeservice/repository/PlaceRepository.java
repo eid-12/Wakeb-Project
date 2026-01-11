@@ -11,7 +11,7 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
 
     // Finds all places for a specific user, ordered by creation time (newest first)
     List<Place> findByUserIdOrderByCreatedAtDesc(Integer userId);
-
+    void deleteByUserId(Integer userId);
     // Finds a specific place by its ID and the user who owns it
     Optional<Place> findByIdAndUserId(Integer id, Integer userId);
 

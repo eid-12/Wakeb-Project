@@ -37,8 +37,8 @@ public class AuthController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(60 * 60 * 2)
-                .secure(true)// Change to true in production
-                .sameSite("None")
+                .secure(false)// Change to true in production
+                .sameSite("Strict")
                 .domain("cloudbase.website")
                 .build();
 
@@ -56,14 +56,11 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from("token", token)
 
-
                 .httpOnly(true)
-
-
                 .path("/")
                 .maxAge(60 * 60 * 2)
-                .secure(true)// Change to true in production
-                .sameSite("None")
+                .secure(false)// Change to true in production
+                .sameSite("Strict")
                 .domain("cloudbase.website")
                 .build();
 

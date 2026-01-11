@@ -63,7 +63,7 @@ public class PlaceService {
 
             throw new IllegalArgumentException("Place not found for this user");
 
-        }
+        }}
 
     // Converts a Place entity to a PlaceResponse DTO
     private PlaceResponse map(Place p) {

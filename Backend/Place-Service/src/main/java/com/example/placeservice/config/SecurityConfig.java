@@ -1,43 +1,26 @@
-package com.example.placeservice.config;
+@Bean
+SecurityFilterChain filter(HttpSecurity http) throws Exception {
+    return http
+            // 1. الحل الجذري: تعطيل CSRF بالكامل لكل مسارات الخدمة
+            // في هندسة الـ Microservices، الـ Gateway هو من يتولى الحماية والـ APIs عادة تكون Stateless
+            .csrf(csrf -> csrf.disable()) 
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+            // تمكين إعدادات CORS الافتراضية
+            .cors(withDefaults())
 
-import static org.springframework.security.config.Customizer.withDefaults;
+            // تعريف قواعد التصريح
+            .authorizeHttpRequests(auth -> auth
+                    // السماح بطلبات OPTIONS الضرورية لـ CORS
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-@Configuration // Marks this class as a Spring configuration class
-public class SecurityConfig {
+                    // السماح بالوصول لجميع مسارات الخدمة بما فيها الحذف والرفع والـ Swagger
+                    .requestMatchers(
+                            "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**",
+                            "/api/auth/**", "/api/place/**", "/error", "/app/uploads/**"
+                    ).permitAll()
 
-    // Defines the security filter chain for this service
-    @Bean
-    SecurityFilterChain filter(HttpSecurity http) throws Exception {
-        return http
-                // Disable CSRF protection (suitable for stateless REST APIs)
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/place/places", "/app/uploads/**"))
-
-                // Enable default CORS settings (allows frontend apps to communicate)
-                .cors(withDefaults())
-
-                // Define authorization rules
-                .authorizeHttpRequests(auth -> auth
-                        // Allow all preflight (OPTIONS) requests — required for CORS
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Allow unauthenticated access to Swagger docs and specific public endpoints
-                        .requestMatchers(
-                                "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**",
-                                "/api/auth/**", "/api/place/**"  ,"/error" // <-- likely temporary during dev
-                        ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/place").permitAll()
-                        // Require authentication for any other request
-                        .anyRequest().authenticated()
-                )
-
-                // Build and return the configured security filter chain
-                .build();
-    }
+                    // تأمين أي طلبات أخرى
+                    .anyRequest().authenticated()
+            )
+            .build();
 }

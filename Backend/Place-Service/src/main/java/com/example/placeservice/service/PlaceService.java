@@ -8,6 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.io.IOException;            // للتعامل مع أخطاء المدخلات والمخرجات
+import java.nio.file.Files;            // لحذف الملفات فعلياً
+import java.nio.file.Path;             // للتعامل مع مسارات الملفات
+import java.nio.file.Paths;            // لتحويل النصوص إلى مسارات
+import java.util.Optional;             // إذا كنت تستخدم Optional بشكل صريح
 
 @Service // Marks this class as a Spring service component
 @RequiredArgsConstructor // Lombok: auto-generates constructor for final fields
@@ -55,7 +60,7 @@ public void delete(Integer userId, Integer placeId) {
     Place place = placeRepo.findByIdAndUserId(placeId, userId)
             .orElseThrow(() -> new IllegalArgumentException("Place not found for this user"));
 
-    // 2. تحديد مسار المجلد (استخدام نفس المنطق الموجود في الـ Controller)
+    // 2. الحصول على مسار المجلد من متغيرات البيئة
     String uploadPath = System.getenv().getOrDefault("UPLOAD_PATH", "/app/uploads");
     String filename = place.getFilename();
 
@@ -63,14 +68,13 @@ public void delete(Integer userId, Integer placeId) {
     if (filename != null && !filename.isEmpty()) {
         try {
             Path filePath = Paths.get(uploadPath).resolve(filename);
-            Files.deleteIfExists(filePath); // يحذف الملف من الهاردسك
+            Files.deleteIfExists(filePath); // يحذف الملف من القرص
         } catch (IOException e) {
-            // سجل الخطأ إذا فشل حذف الملف ولكن استمر في حذف السجل
-            System.err.println("Failed to delete image file: " + filename);
+            System.err.println("Failed to delete image file: " + filename + " Error: " + e.getMessage());
         }
     }
 
-    // 4. الآن نحذف السجل من قاعدة البيانات
+    // 4. حذف السجل من قاعدة البيانات
     placeRepo.delete(place);
 }
 

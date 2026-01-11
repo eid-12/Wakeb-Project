@@ -21,8 +21,9 @@ app.use('/api/auth', createProxyMiddleware({
 
 // بروكسي بوابة التطبيق (API Gateway)
 app.use('/api', createProxyMiddleware({
-    target: 'http://wakeb-application-api-gateway-1:8080',
+    target: 'http://wakeb-application-api-gateway-1:8080/api',
     changeOrigin: true,
+    pathRewrite: { '^/api': '' }, 
     proxyTimeout: 120000,
     timeout: 120000
 }));

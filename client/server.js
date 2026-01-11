@@ -26,16 +26,8 @@ app.use('/api/auth', createProxyMiddleware({
 
     pathRewrite: { '^/api/auth': '/api/auth' },
     onProxyReq: fixRequestBody, // تأكد من استخدام دالة تمرير البيانات التي برمجناها
-proxyTimeout: 120000, // دقيقتين
-    timeout: 120000,
-    on: {
-        proxyErr: (err, req, res) => {
-            console.error('Proxy connection error:', err);
-        }
-    }
-
-
-
+    proxyTimeout: 120000, // دقيقتين
+    timeout: 120000
 
 }));
 

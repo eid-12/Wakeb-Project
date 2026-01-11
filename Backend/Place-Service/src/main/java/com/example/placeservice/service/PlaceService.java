@@ -29,44 +29,39 @@ public class PlaceService {
 
     @Transactional
     public void deleteAll(Integer userId) {
+        // حذف السجلات من القاعدة
         placeRepo.deleteByUserId(userId);
     }
 
     @Transactional
     public void delete(Integer userId, Integer placeId) {
-        // 1. جلب بيانات المكان قبل الحذف
-        // ملاحظة: يجب تعريف findByIdAndUserId في الـ Repository
+        // 1. جلب البيانات لمعرفة اسم الملف قبل حذفه
         Place place = placeRepo.findByIdAndUserId(placeId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Place not found for this user"));
 
-        // 2. تحديد مسار المجلد
+        // 2. مسار الصور
         String uploadPath = System.getenv().getOrDefault("UPLOAD_PATH", "/app/uploads");
         String filename = place.getFilename();
 
-        // 3. حذف الملف الفعلي من القرص
+        // 3. حذف الملف من القرص
         if (filename != null && !filename.isEmpty()) {
             try {
                 Path filePath = Paths.get(uploadPath).resolve(filename);
                 Files.deleteIfExists(filePath); 
             } catch (IOException e) {
-                System.err.println("Failed to delete image file: " + filename + " Error: " + e.getMessage());
+                System.err.println("Error deleting file: " + e.getMessage());
             }
         }
 
-        // 4. حذف السجل من قاعدة البيانات
+        // 4. حذف السجل النهائي
         placeRepo.delete(place);
     }
 
     private PlaceResponse map(Place p) {
         return new PlaceResponse(
-                p.getId(),
-                p.getName(),
-                p.getDescription(),
-                p.getLatitude(),
-                p.getLongitude(),
-                p.getCreatedAt(),
-                p.getCategory(),
-                p.getUserId()
+                p.getId(), p.getName(), p.getDescription(),
+                p.getLatitude(), p.getLongitude(), p.getCreatedAt(),
+                p.getCategory(), p.getUserId()
         );
     }
 }

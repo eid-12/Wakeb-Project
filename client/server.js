@@ -24,6 +24,7 @@ app.use('/api/auth', createProxyMiddleware({
     // والمسار القادم (/api/auth/register) سيتم لصقه تلقائياً في النهاية
     target: 'http://wakeb-application-auth-service-1:8080', 
     changeOrigin: true,
+    pathRewrite: { '^/api/auth': '/api/auth' },
     onProxyReq: fixRequestBody,
     proxyTimeout: 120000,
     timeout: 120000

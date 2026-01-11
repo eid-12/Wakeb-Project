@@ -39,7 +39,7 @@ public class Routes {
     public RouterFunction<ServerResponse> placeServiceRoute() {
         return GatewayRouterFunctions.route("Place-Service")
                 .route(RequestPredicates.path("/api/place/**"), http())
-                .before(uri("http://place-service-1:8080"))
+                .before(uri("http://wakeb-application-place-service-1:8080"))
                 .build();
     }
 
@@ -47,7 +47,7 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> placeServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("Place-Service_Swagger")
-                .route(RequestPredicates.path("/aggregate/place/v3/api-docs"), HandlerFunctions.http("http://place-service-1:8080"))
+                .route(RequestPredicates.path("/aggregate/place/v3/api-docs"), HandlerFunctions.http("http://wakeb-application-place-service-1:8080"))
                 .filter(setPath("/v3/api-docs"))
                 .build();
     }
@@ -57,7 +57,7 @@ public class Routes {
     public RouterFunction<ServerResponse> searchPlaceServiceRoute() {
         return GatewayRouterFunctions.route("Search-Service")
                 .route(RequestPredicates.path("/api/search/**"), http())
-                .before(uri("http://search-service-1:8080"))
+                .before(uri("http://wakeb-application-search-service-1:8080"))
                 .build();
     }
 
@@ -65,7 +65,7 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> searchPlaceServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("Search-Service_Swagger")
-                .route(RequestPredicates.path("/aggregate/search/v3/api-docs"), HandlerFunctions.http("http://search-service-1:8080"))
+                .route(RequestPredicates.path("/aggregate/search/v3/api-docs"), HandlerFunctions.http("http://wakeb-application-search-service-1:8080"))
                 .filter(setPath("/v3/api-docs"))
                 .build();
     }
@@ -75,7 +75,7 @@ public class Routes {
     public RouterFunction<ServerResponse> savedPlaceServiceRoute() {
         return GatewayRouterFunctions.route("SavedPlace-Service")
                 .route(RequestPredicates.path("/api/saved/**"), http())
-                .before(uri("http://savedplace-service-1:8080"))
+                .before(uri("http://wakeb-application-savedplace-service-1:8080"))
                 .build();
     }
 
@@ -83,7 +83,7 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> savedPlaceServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("SavedPlace-Service_Swagger")
-                .route(RequestPredicates.path("/aggregate/saved/v3/api-docs"), HandlerFunctions.http("http://savedplace-service-1:8080"))
+                .route(RequestPredicates.path("/aggregate/saved/v3/api-docs"), HandlerFunctions.http("http://wakeb-application-savedplace-service-1:8080"))
                 .filter(setPath("/v3/api-docs"))
                 .build();
     }

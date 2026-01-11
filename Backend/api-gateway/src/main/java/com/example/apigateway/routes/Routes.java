@@ -21,7 +21,7 @@ public class Routes {
     public RouterFunction<ServerResponse> userServiceRoute() {
         return GatewayRouterFunctions.route("User-Service")
                 .route(RequestPredicates.path("/api/user/**"), http())
-                .before(uri("http://user-service-1:8080")) // Forward to user-service
+                .before(uri("http://wakeb-application-user-service-1:8080")) // Forward to user-service
                 .build();
     }
 
@@ -29,7 +29,7 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> userServiceSwaggerRoute() {
         return GatewayRouterFunctions.route("User-Service_Swagger")
-                .route(RequestPredicates.path("/aggregate/user/v3/api-docs"), HandlerFunctions.http("http://user-service-1:8080"))
+                .route(RequestPredicates.path("/aggregate/user/v3/api-docs"), HandlerFunctions.http("http://wakeb-application-user-service-1:8080"))
                 .filter(setPath("/v3/api-docs")) // Rewrite path before forwarding
                 .build();
     }

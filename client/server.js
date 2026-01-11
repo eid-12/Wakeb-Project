@@ -1,47 +1,44 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
-const bodyParser = require('body-parser');
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+/** * 1. إعدادات البروكسي (يجب أن تكون قبل bodyParser) 
+ * هذا الترتيب يضمن أن البيانات تمر مباشرة للجافا دون أن "تتعلق" أو تستهلك
+ */
 
-const fixRequestBody = (proxyReq, req, res) => {
-    if (req.body && Object.keys(req.body).length) {
-        const bodyData = JSON.stringify(req.body);
-        proxyReq.setHeader('Content-Type', 'application/json');
-        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-        proxyReq.write(bodyData);
-        proxyReq.end();
-    }
-};
-
-// الإعداد بناءً على طلبك (بدون pathRewrite)
+// بروكسي خدمة الأوث (Auth Service)
 app.use('/api/auth', createProxyMiddleware({
-    // نضع البادئة مباشرة في الرابط
+    // نضع المسار كاملاً كما طلبت لضمان وصوله للجافا بشكل سليم
     target: 'http://wakeb-application-auth-service-1:8080/api/auth', 
     changeOrigin: true,
-    // نجعل الـ rewrite يحذف البادئة القديمة لكي لا تتكرر
+    // نحذف البادئة لكي لا تظهر مكررة في الرابط النهائي
     pathRewrite: { '^/api/auth': '' }, 
-    onProxyReq: fixRequestBody,
     proxyTimeout: 120000,
     timeout: 120000
 }));
 
+// بروكسي بوابة التطبيق (API Gateway)
 app.use('/api', createProxyMiddleware({
     target: 'http://wakeb-application-api-gateway-1:8080',
     changeOrigin: true,
-    onProxyReq: fixRequestBody,
     proxyTimeout: 120000,
     timeout: 120000
 }));
 
+/** * 2. إعدادات معالجة البيانات (تأتي بعد البروكسي)
+ */
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+/** * 3. ملفات الفرونت إند (Vue.js Dist)
+ */
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(3000, () => console.log('✅ Proxy is running and forwarding directly'));
+app.listen(3000, () => console.log('✅ Proxy is running and forwarding directly with optimized order'));

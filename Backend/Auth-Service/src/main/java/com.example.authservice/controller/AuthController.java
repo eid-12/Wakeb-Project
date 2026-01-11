@@ -62,8 +62,8 @@ public class AuthController {
 
                 .path("/")
                 .maxAge(60 * 60 * 2)
-                .secure(false)// Change to true in production
-                .sameSite("Strict")
+                .secure(true)// Change to true in production
+                .sameSite("None")
                 .domain("cloudbase.website")
                 .build();
 

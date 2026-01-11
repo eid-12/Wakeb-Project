@@ -21,7 +21,7 @@ const fixRequestBody = (proxyReq, req, res) => {
 app.use('/api/auth', createProxyMiddleware({
     // ملاحظة: بما أنك أزلت pathRewrite، يجب أن يكون التارغت هو السيرفر فقط
     // والمسار القادم (/api/auth/register) سيتم لصقه تلقائياً في النهاية
-    target: 'http://wakeb-application-auth-service-1:8080'/api/auth', 
+    target: 'http://wakeb-application-auth-service-1:8080/api/auth', 
     changeOrigin: true,
     onProxyReq: fixRequestBody,
     proxyTimeout: 120000,

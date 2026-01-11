@@ -2,32 +2,27 @@ package com.example.placeservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsWebFilter;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
-@Configuration // Marks this class as a Spring configuration class
+@Configuration
 public class CorsConfig {
 
-    // Defines a CORS filter with the highest priority
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    public CorsWebFilter corsWebFilter() {
+    public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowCredentials(true); // Allow cookies and authorization headers
-        config.setAllowedOriginPatterns(List.of("http://localhost:80", "https://maps.cloudbase.website", "http://localhost:3000")); // Allow requests from frontend
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // Allowed HTTP methods
-        config.setAllowedHeaders(List.of("*")); // Allow all headers
-        config.setMaxAge(3600L); // Cache the preflight response for 1 hour
+        config.setAllowCredentials(true);
+        // السماح بالروابط الخاصة بك
+        config.setAllowedOriginPatterns(List.of("http://localhost:80", "https://maps.cloudbase.website", "http://localhost:3000"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // Apply CORS config to all endpoints
-
-        return new CorsWebFilter(source);
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 }

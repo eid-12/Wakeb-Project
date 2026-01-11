@@ -1,23 +1,22 @@
 package com.example.placeservice.repository;
 
 import com.example.placeservice.model.Place;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-// JPA repository for managing Place entities
 public interface PlaceRepository extends JpaRepository<Place, Integer> {
 
-    // Finds all places for a specific user, ordered by creation time (newest first)
+    // استرجاع الأماكن حسب المستخدم
     List<Place> findByUserIdOrderByCreatedAtDesc(Integer userId);
-    void deleteByUserId(Integer userId);
-    // Finds a specific place by its ID and the user who owns it
+
+    // البحث عن مكان محدد لمستخدم محدد
     Optional<Place> findByIdAndUserId(Integer id, Integer userId);
 
-    // Deletes all places for a specific user, returns number of rows deleted
+    // دالة واحدة فقط لحذف جميع أماكن المستخدم (تعيد عدد الصفوف المحذوفة)
     Long deleteByUserId(Integer userId);
 
-    // Deletes a specific place for a specific user, returns number of rows deleted
+    // حذف مكان محدد لمستخدم محدد
     Long deleteByIdAndUserId(Integer id, Integer userId);
 }

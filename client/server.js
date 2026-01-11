@@ -20,11 +20,11 @@ const fixRequestBody = (proxyReq, req, res) => {
 
 // الإعداد بناءً على طلبك (بدون pathRewrite)
 app.use('/api/auth', createProxyMiddleware({
-    // ملاحظة: بما أنك أزلت pathRewrite، يجب أن يكون التارغت هو السيرفر فقط
-    // والمسار القادم (/api/auth/register) سيتم لصقه تلقائياً في النهاية
-    target: 'http://wakeb-application-auth-service-1:8080', 
+    // نضع البادئة مباشرة في الرابط
+    target: 'http://wakeb-application-auth-service-1:8080/api/auth', 
     changeOrigin: true,
-    pathRewrite: { '^/api/auth': '/api/auth' },
+    // نجعل الـ rewrite يحذف البادئة القديمة لكي لا تتكرر
+    pathRewrite: { '^/api/auth': '' }, 
     onProxyReq: fixRequestBody,
     proxyTimeout: 120000,
     timeout: 120000

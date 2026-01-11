@@ -22,10 +22,9 @@ const fixRequestBody = (proxyReq, req, res) => {
 };
 
 app.use('/api/auth', createProxyMiddleware({
-    target: 'http://wakeb-application-auth-service-1:8080', 
+    target: 'http://wakeb-application-auth-service-1:8080/api/auth', 
     changeOrigin: true,
-    // احذف أي سطر يحتوي على pathRewrite إذا كنت ترغب في إرسال المسار كاملاً
-    // أو تأكد أنه يوجه للمسار الصحيح هكذا:
+
     pathRewrite: { '^/api/auth': '/api/auth' },
     onProxyReq: fixRequestBody // تأكد من استخدام دالة تمرير البيانات التي برمجناها
 

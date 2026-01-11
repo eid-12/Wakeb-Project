@@ -61,7 +61,7 @@ public class PlaceController {
         String filename = null;
         if (image != null && !image.isEmpty()) {
             Path uploadDir = Paths.get(System.getenv()
-                    .getOrDefault("RAILWAY_VOLUME_MOUNT_PATH", "/app/uploads"));
+                    .getOrDefault("UPLOAD_PATH", "/app/uploads"));
             Files.createDirectories(uploadDir);
 
             filename = UUID.randomUUID() + "_" + image.getOriginalFilename();

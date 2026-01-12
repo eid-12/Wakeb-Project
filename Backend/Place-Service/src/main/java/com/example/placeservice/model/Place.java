@@ -5,41 +5,39 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-@Entity // Marks this class as a JPA entity mapped to a table
-@Data // Lombok: generates getters, setters, toString, equals, hashCode
-@NoArgsConstructor // Lombok: no-argument constructor
-@AllArgsConstructor // Lombok: constructor with all fields
+@Entity 
+@Data 
+@NoArgsConstructor 
+@AllArgsConstructor 
 public class Place {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length = 100, nullable = false) // Place name (required, max 100 chars)
+    @Column(length = 100, nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT") // Optional long description
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false, precision = 9, scale = 6) // Latitude with 6 decimal places
+    @Column(nullable = false, precision = 9, scale = 6)
     private BigDecimal latitude;
 
-    @Column(nullable = false, precision = 9, scale = 6) // Longitude with 6 decimal places
+    @Column(nullable = false, precision = 9, scale = 6)
     private BigDecimal longitude;
 
-    // Optional image path (e.g. for map thumbnail or photo)
-    private String imagePath;
+    // تم تغيير الاسم هنا من imagePath إلى filename ليتوافق مع الـ Controller والـ Service
+    private String filename; 
 
-    @CreationTimestamp // Automatically set when inserted into the database
+    @CreationTimestamp 
     private Timestamp createdAt;
 
-    // Optional category for the place (e.g., "Restaurant", "Park")
     private String category;
 
-    @Column(name = "user_id", nullable = false) // ID of the user who owns this place
+    @Column(name = "user_id", nullable = false)
     private Integer userId;
 }

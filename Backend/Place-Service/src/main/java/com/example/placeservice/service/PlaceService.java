@@ -34,38 +34,31 @@ public class PlaceService {
 
     @Transactional
     public void delete(Integer userId, Integer placeId) {
-        // 1. Fetch place to get filename before deletion
+        // Find record first to get the filename
         Place place = placeRepo.findByIdAndUserId(placeId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Place not found for this user"));
 
-        // 2. Determine upload path from environment
         String uploadPath = System.getenv().getOrDefault("UPLOAD_PATH", "/app/uploads");
         String filename = place.getFilename();
 
-        // 3. Delete physical file if it exists
+        // Physical file deletion
         if (filename != null && !filename.isEmpty()) {
             try {
                 Path filePath = Paths.get(uploadPath).resolve(filename);
-                Files.deleteIfExists(filePath);
+                Files.deleteIfExists(filePath); 
             } catch (IOException e) {
-                System.err.println("Failed to delete image file: " + filename);
+                System.err.println("Could not delete file: " + filename);
             }
         }
 
-        // 4. Delete record from database
         placeRepo.delete(place);
     }
 
     private PlaceResponse map(Place p) {
         return new PlaceResponse(
-                p.getId(),
-                p.getName(),
-                p.getDescription(),
-                p.getLatitude(),
-                p.getLongitude(),
-                p.getCreatedAt(),
-                p.getCategory(),
-                p.getUserId()
+                p.getId(), p.getName(), p.getDescription(),
+                p.getLatitude(), p.getLongitude(), p.getCreatedAt(),
+                p.getCategory(), p.getUserId()
         );
     }
 }

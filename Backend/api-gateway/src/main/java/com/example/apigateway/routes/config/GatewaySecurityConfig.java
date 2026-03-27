@@ -67,7 +67,12 @@ public class GatewaySecurityConfig {
         config.setAllowCredentials(true); // Allow cookies and authorization headers
 
         // Allow requests from any localhost port (e.g., Vue/React running on :5173, :8080, etc.)
-        config.setAllowedOrigins(List.of("http://localhost:80", "https://maps.cloudbase.website", "http://localhost:3000"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost:80",
+                "http://localhost:3000",
+                "http://localhost:5174",
+                "http://127.0.0.1:5174",
+                "https://maps.cloudbase.website"));
 
         config.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
         config.setAllowedMethods(Arrays.asList("GET", "PATCH", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods

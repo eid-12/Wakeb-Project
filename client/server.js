@@ -5,13 +5,20 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const app = express();
 
 /**
- * Proxy targets (override per environment — e.g. Railway / Docker service names).
- * Defaults match the existing deployment hostnames so production keeps working.
+ * Proxy targets (override per environment — Docker / Railway / local).
+ * Local default: gateway 8080, auth 8081 (set Auth-Service server.port=8081 when running both on one machine).
+ * Production: set AUTH_SERVICE_ORIGIN / API_GATEWAY_ORIGIN to your container URLs.
  */
 const AUTH_SERVICE_ORIGIN =
-  process.env.AUTH_SERVICE_ORIGIN || 'http://wakeb-application-auth-service-1:8080';
+  process.env.AUTH_SERVICE_ORIGIN ||
+  (process.env.NODE_ENV === 'production'
+    ? 'http://wakeb-application-auth-service-1:8080'
+    : 'http://localhost:8081');
 const API_GATEWAY_ORIGIN =
-  process.env.API_GATEWAY_ORIGIN || 'http://wakeb-application-api-gateway-1:8080';
+  process.env.API_GATEWAY_ORIGIN ||
+  (process.env.NODE_ENV === 'production'
+    ? 'http://wakeb-application-api-gateway-1:8080'
+    : 'http://localhost:8080');
 
 /** Order matters: register /api/auth before /api so auth hits the auth service first. */
 app.use(

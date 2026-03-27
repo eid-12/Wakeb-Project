@@ -49,7 +49,7 @@
           <li :class="{ active: selectedMenu === 'add' }" @click="selectedMenu = 'add'">{{ t('menu.add') }}</li>
 
           <li :class="{ active: selectedMenu === 'settings' }" @click="selectedMenu = 'settings'">{{ t('menu.settings') }}</li>
-          <li v-show="!user?.isUser" :class="{ active: selectedMenu === 'admin' }" @click="selectedMenu = 'admin'">{{ t('menu.admin') }}</li>          
+          <li v-show="isProfileAdmin(user)" :class="{ active: selectedMenu === 'admin' }" @click="selectedMenu = 'admin'">{{ t('menu.admin') }}</li>          
         </ul>
       </div>
 
@@ -136,7 +136,7 @@ import SavedPlacesPanel   from '@/components/SavedPlacesPanel.vue';
 import SearchHistoryPanel from '@/components/SearchHistoryPanel.vue';
 import AdminPanel from '@/components/AdminPanel.vue';
 import WelcomeOverlay from '@/components/WelcomeOverlay.vue'
-import { useUser ,getUser ,deleteTokenCookie} from '@/api/user';
+import { useUser, getUser, deleteTokenCookie, isProfileAdmin } from '@/api/user';
 import { useAlerts } from '@/composables/useAlerts';
 /*************************
  * Reactive state
@@ -428,7 +428,18 @@ async function addToFavorites(place) {
   }
 }
 
-onMounted( () => {
+onMounted(async () => {
+  try {
+    const u = await getUser();
+    setUser(u);
+    isLoggedIn.value = true;
+  } catch (e) {
+    if (e.response?.status === 401) {
+      clearUser();
+      isLoggedIn.value = false;
+    }
+  }
+
   if (mapInitialized) return;
   const WORLD_BOUNDS = leaflet.latLngBounds([-90, -180], [90, 180]);
   map = leaflet.map('map', {

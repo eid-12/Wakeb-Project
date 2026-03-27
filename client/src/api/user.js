@@ -2,9 +2,33 @@ import { API_GATEWAY, AUTH_API, MAPBOX_API } from '@/api/http';
 import { ref } from 'vue';
 import { MAPBOX_ACCESS_TOKEN } from '@/config/env';
 
+/**
+ * Admin in profile = regular-user flag is false (User-Service `isUser` / `is_user`).
+ * Handles Jackson naming quirks (`user` vs `isUser`) and numeric DB values.
+ */
+export function isProfileAdmin(u) {
+  if (!u || typeof u !== 'object') return false;
+  let v = u.isUser;
+  if (v === undefined && u.user !== undefined) v = u.user;
+  if (typeof v === 'number') return v === 0;
+  return v === false;
+}
+
+function normalizeUserProfile(d) {
+  if (!d || typeof d !== 'object') return d;
+  const out = { ...d };
+  if (out.isUser === undefined && out.user !== undefined) {
+    out.isUser = out.user;
+  }
+  if (typeof out.isUser === 'number') {
+    out.isUser = out.isUser !== 0;
+  }
+  return out;
+}
+
 export const getUser = async () => {
   const { data } = await API_GATEWAY.get('/user');
-  return data;
+  return normalizeUserProfile(data);
 };
 
 /** Backend EmailUpdateRequest: { oldEmail, newEmail } — oldEmail may be null if the account has no email yet */

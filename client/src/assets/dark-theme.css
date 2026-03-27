@@ -163,6 +163,16 @@ html.dark .wakeb-map-features .geo-icon {
   color: #5eead4;
 }
 
+/* Add place: file input button (Tailwind cannot @apply dark:file: variants) */
+html.dark .wakeb-add-place-form .input-file::file-selector-button {
+  background-color: rgba(6, 78, 59, 0.55);
+  color: #a7f3d0;
+}
+
+html.dark .wakeb-add-place-form .input-file::file-selector-button:hover {
+  background-color: rgba(6, 95, 70, 0.65);
+}
+
 /* Saved Places panel (scoped .saved-panel lives inside html.dark) */
 html.dark .saved-panel {
   background: #1e293b;

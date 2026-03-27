@@ -4,18 +4,23 @@ package com.example.authservice.controller;
 // Import required classes
 import com.example.authservice.client.UserClient;
 import com.example.authservice.dto.*;
-import com.example.authservice.security.userdetails.CustomUserDetailsService;
 import com.example.authservice.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
+
+import com.example.authservice.model.User;
+import com.example.authservice.security.jwt.JwtService;
 
 import feign.FeignException;
 
@@ -33,6 +38,8 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserClient userClient;
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
     // Register a new user and set JWT token as an HTTP-only cookie
     @PostMapping("/register")
@@ -73,6 +80,46 @@ public class AuthController {
 
         response.addHeader("Set-Cookie", cookie.toString());
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Session snapshot from Auth DB {@code users.is_user}: {@code false} / 0 = admin, {@code true} / 1 = regular user.
+     * Accepts the same JWT as login: {@code token} cookie or {@code Authorization: Bearer}.
+     */
+    @GetMapping("/me")
+    public ResponseEntity<AuthMeResponse> me(HttpServletRequest request) {
+        String token = extractAccessToken(request);
+        if (token == null || token.isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            String username = jwtService.extractUsername(token);
+            UserDetails ud = userDetailsService.loadUserByUsername(username);
+            if (!jwtService.isTokenValid(token, ud)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            User u = (User) ud;
+            return ResponseEntity.ok(new AuthMeResponse(u.getId(), u.getUsername(), u.getIsUser()));
+        } catch (Exception e) {
+            log.debug("auth /me failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    private static String extractAccessToken(HttpServletRequest request) {
+        String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (auth != null && auth.startsWith("Bearer ")) {
+            return auth.substring(7).trim();
+        }
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if ("token".equals(c.getName()) && c.getValue() != null && !c.getValue().isBlank()) {
+                    return c.getValue().trim();
+                }
+            }
+        }
+        return null;
     }
 
     @PostMapping("/logout")

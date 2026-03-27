@@ -41,9 +41,20 @@ function normalizeUserProfile(d) {
   return out;
 }
 
+export const getAuthMe = () => AUTH_API.get('/me');
+
 export const getUser = async () => {
   const { data } = await API_GATEWAY.get('/user');
-  return normalizeUserProfile(data);
+  const profile = normalizeUserProfile(data);
+  try {
+    const { data: auth } = await getAuthMe();
+    if (auth && Object.prototype.hasOwnProperty.call(auth, 'isUser')) {
+      profile.isUser = auth.isUser;
+    }
+  } catch {
+    /* no valid auth cookie / session — keep profile from User-Service only */
+  }
+  return profile;
 };
 
 /** Backend EmailUpdateRequest: { oldEmail, newEmail } — oldEmail may be null if the account has no email yet */

@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/api/auth/me").permitAll()
                         // 1. السماح بمرور طلبات الأوثنتيكيشن
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         // 2. التعديل المهم: السماح بمرور مسار الأخطاء لرؤية السبب الحقيقي (Fix for 403 on /error)
@@ -69,7 +70,8 @@ public class SecurityConfig {
         // استخدام الأنماط للسماح للبروكسي والنطاق الخاص بك
         configuration.setAllowedOriginPatterns(List.of(
                 "https://maps.cloudbase.website",
-                "http://localhost:3000",
+                "http://localhost:*",
+                "http://127.0.0.1:*",
                 "http://wakeb-application-frontend-1:3000"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

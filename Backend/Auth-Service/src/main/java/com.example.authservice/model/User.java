@@ -31,8 +31,15 @@ public class User implements UserDetails, Serializable {
     @Column(nullable = false, columnDefinition = "boolean default true") // Flag to indicate user role
     private Boolean isUser = true;
 
-    /** Persisted as email_verified — must be set on insert (DB column has no default in some deployments). */
-    @Column(name = "email_verified", nullable = false)
+    /**
+     * DB column only — not shown in login/register (those use username + password).
+     * Means “has the user verified an email?”; always false at signup until you add email flows.
+     * Default false + DB default prevents INSERT errors when the column is NOT NULL.
+     */
+    @Column(
+            name = "email_verified",
+            nullable = false,
+            columnDefinition = "TINYINT(1) NOT NULL DEFAULT 0")
     @Builder.Default
     private Boolean emailVerified = false;
 

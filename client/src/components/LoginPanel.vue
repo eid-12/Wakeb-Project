@@ -94,6 +94,13 @@ const resetForm = () => {
   };
 };
 
+function apiErrorMessage(err, fallback) {
+  const d = err.response?.data;
+  if (typeof d === 'string' && d.trim()) return d.trim();
+  if (d && typeof d.message === 'string' && d.message.trim()) return d.message.trim();
+  return fallback;
+}
+
 function toggleMode() {
   isRegister.value = !isRegister.value;
   resetForm();
@@ -168,7 +175,7 @@ async function handleSubmit() {
       emit('success');
       resetForm();
     } catch (err) {
-      const msg = err.response?.data || 'Registration failed. Please try again.';
+      const msg = apiErrorMessage(err, 'Registration failed. Please try again.');
       showAlert({ type: 'danger', title: 'Registration Error', message: msg });
     }
   } else {

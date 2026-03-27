@@ -32,3 +32,10 @@
   border: none !important;
   box-shadow: none !important;
 }
+
+.swal-error-confirm-btn {
+  background-color: #475569 !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: none !important;
+}

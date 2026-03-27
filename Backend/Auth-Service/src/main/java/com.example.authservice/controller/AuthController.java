@@ -14,15 +14,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // REST controller that handles authentication-related endpoints
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor // Injects required dependencies via constructor
 public class AuthController {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthService authService;
     private final UserClient userClient;
@@ -86,11 +91,36 @@ public class AuthController {
 
 
 
-    // Handle runtime exceptions with a 400 Bad Request response
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    /** DB constraint / column issues — never expose SQL to clients. */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        log.warn("Data integrity violation: {}", ex.getMostSpecificCause().getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "message",
+                "We could not create your account. Please try again or pick a different username."));
+    }
+
+    /** Safe messages for known business errors; hide internal/DB details for anything else. */
     @ExceptionHandler(RuntimeException.class)
-    public String handleRuntime(RuntimeException ex) {
-        return ex.getMessage();
+    public ResponseEntity<Map<String, String>> handleRuntime(RuntimeException ex) {
+        String raw = ex.getMessage();
+        if (raw == null || looksLikeInfrastructureError(raw)) {
+            log.error("Unhandled registration/auth error", ex);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "message", "Something went wrong. Please try again later."));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", raw));
+    }
+
+    private static boolean looksLikeInfrastructureError(String msg) {
+        String m = msg.toLowerCase();
+        return m.contains("sql")
+                || m.contains("jdbc")
+                || m.contains("hibernate")
+                || m.contains("could not execute")
+                || m.contains("constraint")
+                || m.contains("field '")
+                || m.contains("column ");
     }
 
     // Change password by user
@@ -128,5 +158,5 @@ public class AuthController {
 
         return ResponseEntity.ok("Password updated");
     }
-    }
+}
 

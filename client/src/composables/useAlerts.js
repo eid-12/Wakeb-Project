@@ -6,18 +6,20 @@ export function useAlerts() {
     const iconMap = { danger: 'error', error: 'error', success: 'success', info: 'info', warning: 'warning' };
     const icon = iconMap[type] || 'info';
     const autoClose = duration ?? (type === 'success' ? 2500 : undefined);
+    const isError = type === 'danger' || type === 'error';
+    const confirmButtonColor = isError ? '#475569' : '#10b981';
 
     return Swal.fire({
       icon,
       title,
       text: message,
-      confirmButtonText: 'Ok',
-      confirmButtonColor: '#10b981',
+      confirmButtonText: 'OK',
+      confirmButtonColor,
       timer: autoClose,
       timerProgressBar: !autoClose,
       customClass: {
-        confirmButton: 'swal-custom-btn'
-      }
+        confirmButton: isError ? 'swal-error-confirm-btn' : 'swal-custom-btn',
+      },
     });
   }
 

@@ -27,6 +27,13 @@ public class User implements UserDetails, Serializable {
     private String username;
 
     /**
+     * MySQL {@code name} is often NOT NULL with no default. Registration only collects username;
+     * we reuse it as the display name until a profile flow sets a real name.
+     */
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
+
+    /**
      * MySQL often has NOT NULL {@code email} with no default. The product does not collect email;
      * we persist a synthetic value derived from username so INSERT always succeeds and stays unique.
      */
@@ -74,6 +81,9 @@ public class User implements UserDetails, Serializable {
         }
         if (email == null || email.isBlank()) {
             email = username != null ? username + "@noreply.local" : "pending@noreply.local";
+        }
+        if (name == null || name.isBlank()) {
+            name = username != null && !username.isBlank() ? username : "User";
         }
     }
 

@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,6 +47,10 @@ public class User implements UserDetails, Serializable {
     @Builder.Default
     private Boolean isActive = true;
 
+    /** Required when MySQL {@code created_at} is NOT NULL without DEFAULT. */
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     @PrePersist
     void applySignupDefaults() {
         if (isUser == null) {
@@ -56,6 +61,9 @@ public class User implements UserDetails, Serializable {
         }
         if (isActive == null) {
             isActive = true;
+        }
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
         }
     }
 

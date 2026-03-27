@@ -22,7 +22,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user1 in users" v-show="  user1.id !=user.id" :key="user1.id">
+        <tr v-for="user1 in users" :key="user1.id">
           <td>{{ user1.name }}</td>
           <td>{{ user1.email }}</td>
           <td>{{ user1.isUser ? 'User' : 'Admin' }}</td>
@@ -43,7 +43,8 @@
   </button>
 
   <button
-    @click="deleteUsers(user1.id) " v-show="user1.active "
+    @click="deleteUsers(user1.id)"
+    v-show="user1.active && user1.id !== user?.id"
     class="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-full text-sm font-medium transition"
   >
     <i class="fas fa-trash-alt"></i> Delete

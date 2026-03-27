@@ -333,21 +333,31 @@ setTimeout(() => { showNavbarSuccess.value = false }, 4000);
   maybeAutoClearSearchHistory();
 }
 
-function logout() {
-  deleteTokenCookie() ;
+async function logout() {
+  selectedMenu.value = 'map';
+  showLogin.value = false;
+
+  try {
+    await deleteTokenCookie();
+  } catch {
+    /* still clear UI if network fails */
+  }
+
   clearUser();
-  loginPanelRef.value?.logoutUser?.()
-removeResultsRef.value?.removeResults?.()
+  loginPanelRef.value?.logoutUser?.();
+  removeResultsRef.value?.removeResults?.();
 
   isLoggedIn.value = false;
-  window.location.href = '/';
 
-removeRoute();
+  removeRoute();
   removeGeolocation();
   coords.value = null;
   searchResults.value = null;
   resultMarker.value?.remove?.();
   resultMarker.value = null;
+
+  /* إعادة تحميل كاملة حتى تُغلق القوائم الجانبية ولا يبقى SPA بحالة قديمة */
+  window.location.reload();
 }
 
 function hideWelcome () {

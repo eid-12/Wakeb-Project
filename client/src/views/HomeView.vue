@@ -75,9 +75,7 @@
   @change-menu="selectedMenu = $event"
   @logout = "logout"
 />
-    <AdminPanel
-       v-if="selectedMenu === 'admin'"
-/>
+    <AdminPanel v-if="selectedMenu === 'admin' && isProfileAdmin(user)" />
 <SearchHistoryPanel   v-if= "selectedMenu ==='history'" />
 
         <!-- Map features overlay -->

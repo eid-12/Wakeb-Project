@@ -3,25 +3,40 @@ import { ref } from 'vue';
 import { MAPBOX_ACCESS_TOKEN } from '@/config/env';
 
 /**
- * Admin in profile = regular-user flag is false (User-Service `isUser` / `is_user`).
- * Handles Jackson naming quirks (`user` vs `isUser`) and numeric DB values.
+ * أدمن = في User-Service عمود is_user قيمته 0 (أو false في JSON).
+ * مستخدم عادي = is_user = 1 (أو true).
  */
+function rawIsUserFlag(u) {
+  if (u.isUser !== undefined && u.isUser !== null) return u.isUser;
+  if (u.is_user !== undefined && u.is_user !== null) return u.is_user;
+  if (u.user !== undefined && u.user !== null) return u.user;
+  return undefined;
+}
+
+/** يعيد true إن كان الملف الشخصي أدمن (is_user / isUser = 0 أو false). */
 export function isProfileAdmin(u) {
   if (!u || typeof u !== 'object') return false;
-  let v = u.isUser;
-  if (v === undefined && u.user !== undefined) v = u.user;
-  if (typeof v === 'number') return v === 0;
-  return v === false;
+  const v = rawIsUserFlag(u);
+  if (v === false || v === 0) return true;
+  if (typeof v === 'string') {
+    const s = v.trim().toLowerCase();
+    if (s === '0' || s === 'false') return true;
+  }
+  return false;
 }
 
 function normalizeUserProfile(d) {
   if (!d || typeof d !== 'object') return d;
   const out = { ...d };
-  if (out.isUser === undefined && out.user !== undefined) {
-    out.isUser = out.user;
+  if (out.isUser === undefined) {
+    if (out.is_user !== undefined) out.isUser = out.is_user;
+    else if (out.user !== undefined) out.isUser = out.user;
   }
   if (typeof out.isUser === 'number') {
     out.isUser = out.isUser !== 0;
+  } else if (typeof out.isUser === 'string') {
+    const s = out.isUser.trim().toLowerCase();
+    out.isUser = s !== '0' && s !== 'false' && s !== '';
   }
   return out;
 }

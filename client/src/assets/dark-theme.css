@@ -1,0 +1,38 @@
+/* Dark mode for HomeView layout (scoped styles don’t see html.dark alone) */
+html.dark .page-container .navbar {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+html.dark .page-container .logout-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+html.dark .page-container .side-dashboard {
+  background-color: #020617;
+  color: #e2e8f0;
+}
+
+html.dark .page-container .dashboard-menu li:hover {
+  background-color: #1e293b;
+}
+
+html.dark .page-container .dashboard-menu li.active {
+  background-color: #134e4a;
+}
+
+html.dark .page-container .user-flag {
+  border-color: rgba(148, 163, 184, 0.35);
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+html.dark .page-container .login-panel {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+html.dark .page-container .status-message {
+  color: #6ee7b7;
+}

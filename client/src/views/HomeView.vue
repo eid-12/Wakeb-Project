@@ -4,21 +4,21 @@
   <!-- Navbar -->  
     <nav class="navbar" aria-label="Main">
       <div class="navbar-left">
-        <h1 class="logo">Wakeb Maps</h1>
+        <h1 class="logo">{{ t('app.title') }}</h1>
       </div>
       <div class="navbar-right">
-        <span v-if="showNavbarSuccess" class="status-message">Success! ✓</span>
+        <span v-if="showNavbarSuccess" class="status-message">{{ t('nav.success') }}</span>
           
           <button v-if="isLoggedIn" type="button" class="user-flag" @click="selectedMenu = 'settings'">
           <i class="fa-solid fa-user" aria-hidden="true"></i>
-          <span class="user-flag__name">{{ user?.name }}</span>
+          <span class="user-flag__name">{{ user?.name ?? user?.username }}</span>
           </button>
 
         <button id="Logout" v-if="isLoggedIn" type="button" class="logout-button" @click="logout">
-          <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
+          <i class="fas fa-sign-out-alt" aria-hidden="true"></i> {{ t('nav.logout') }}
         </button>
         <button v-else type="button" class="logout-button" @click="showLogin = true">
-          <i class="fas fa-user" aria-hidden="true"></i> Login
+          <i class="fas fa-user" aria-hidden="true"></i> {{ t('nav.login') }}
         </button>
       </div>
     </nav>
@@ -40,17 +40,16 @@
       <!-- Sidebar (only when logged in) -->
       <div v-if="isLoggedIn" class="side-dashboard">
         <ul class="dashboard-menu">
-          <li :class="{ active: selectedMenu === 'map' }" @click="selectedMenu = 'map'">Map</li>
+          <li :class="{ active: selectedMenu === 'map' }" @click="selectedMenu = 'map'">{{ t('menu.map') }}</li>
 
-          <li   
-  :class="{ active: selectedMenu === 'saved' }"     @click="selectedMenu = 'saved'">Saved Places</li>
+          <li :class="{ active: selectedMenu === 'saved' }" @click="selectedMenu = 'saved'">{{ t('menu.saved') }}</li>
 
-          <li :class="{ active: selectedMenu === 'history' }" @click="selectedMenu= 'history'">Search History</li>
+          <li :class="{ active: selectedMenu === 'history' }" @click="selectedMenu = 'history'">{{ t('menu.history') }}</li>
 
-          <li     :class="{ active: selectedMenu === 'add' }" @click="selectedMenu = 'add'"   >Add Unlisted Place</li>
+          <li :class="{ active: selectedMenu === 'add' }" @click="selectedMenu = 'add'">{{ t('menu.add') }}</li>
 
-          <li :class="{ active: selectedMenu === 'settings' }" @click="selectedMenu = 'settings'">Settings</li>
-          <li v-show="!user?.isUser"      :class="{ active: selectedMenu === 'admin' }" @click="selectedMenu = 'admin'">Administration </li>          
+          <li :class="{ active: selectedMenu === 'settings' }" @click="selectedMenu = 'settings'">{{ t('menu.settings') }}</li>
+          <li v-show="!user?.isUser" :class="{ active: selectedMenu === 'admin' }" @click="selectedMenu = 'admin'">{{ t('menu.admin') }}</li>          
         </ul>
       </div>
 
@@ -115,11 +114,13 @@
 /*************************
  * Imports
  *************************/
-import { ref, onMounted, watch , nextTick} from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import leaflet from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
-import { searchpo ,addToFavorite } from '@/api/user';
+import { searchpo, addToFavorite, clearSearchHistory } from '@/api/user';
+import { appSettings } from '@/composables/useAppSettings';
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_GEOCODING_BASE } from '@/config/env';
 
 
@@ -148,8 +149,25 @@ const savedPlaces = ref(JSON.parse(localStorage.getItem('savedPlaces') || '[]'))
 const latestQuery = ref("");
 const showWelcome = ref(true)
 /* Titles could still be useful somewhere else */
-const { user, setUser , clearUser } = useUser();
-const { showAlert} = useAlerts();
+const { t } = useI18n();
+const { user, setUser, clearUser } = useUser();
+const { showAlert } = useAlerts();
+
+const LAST_HISTORY_AUTO_CLEAR = 'wakeb.history.lastAutoClear';
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+async function maybeAutoClearSearchHistory() {
+  if (!isLoggedIn.value || !appSettings.autoDeleteHistory) return;
+  const now = Date.now();
+  const last = Number(localStorage.getItem(LAST_HISTORY_AUTO_CLEAR) || '0');
+  if (now - last < WEEK_MS) return;
+  try {
+    await clearSearchHistory();
+    localStorage.setItem(LAST_HISTORY_AUTO_CLEAR, String(now));
+  } catch (e) {
+    console.warn('Auto-clear search history failed:', e);
+  }
+}
 const loginPanelRef = ref(null)
 const removeResultsRef = ref(null)
 
@@ -176,6 +194,15 @@ let placeName = [];
  * Helper functions
  *************************/
 function getGeolocation() {
+  if (!appSettings.locationTracking) {
+    showAlert({
+      type: 'info',
+      title: t('settings.privacy'),
+      message: t('geo.enableInSettings'),
+    });
+    return;
+  }
+
   if (coords.value) {
     removeGeolocation();
     removeRoute();
@@ -305,7 +332,7 @@ async function handleLoginSuccess() {
 setTimeout(() => { showNavbarSuccess.value = false }, 4000);
  const u = await getUser();
   setUser(u);
-
+  maybeAutoClearSearchHistory();
 }
 
 function logout() {
@@ -348,6 +375,10 @@ watch(selectedMenu, (val) => {
   }
 });
 
+watch(isLoggedIn, (v) => {
+  if (v) maybeAutoClearSearchHistory();
+});
+
 function flyTo (place) {
   selectedMenu.value = 'map';
 
@@ -380,6 +411,17 @@ async function addToFavorites(place) {
     const { data } = await addToFavorite(payload)
     savedPlaces.value.push(data);
     showAlert({ type: 'success', title: 'Saved ', message: ' Added to favorites ⭐' });
+    if (
+      appSettings.savedPlacesNotifications &&
+      typeof Notification !== 'undefined' &&
+      Notification.permission === 'granted'
+    ) {
+      try {
+        new Notification('Wakeb Maps', { body: payload.title });
+      } catch {
+        /* ignore */
+      }
+    }
   } catch (err) {
     console.error('Failed to save place:', err);
     showAlert({ type: 'danger', title: ' Save Failed', message: ' Could not add to favorites ❌' });
@@ -507,7 +549,9 @@ btn.addEventListener('click', (evt) => {
 });
 
   map.on('moveend', closeSearchResults);
-  getGeolocation();
+  if (appSettings.locationTracking) {
+    getGeolocation();
+  }
   mapInitialized = true;
 
 

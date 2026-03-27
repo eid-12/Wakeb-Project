@@ -17,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
+import feign.FeignException;
+
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +93,23 @@ public class AuthController {
 
 
 
+    /** User-service (Feign) failures — do not leak HTTP bodies or stack traces. */
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<Map<String, String>> handleFeign(FeignException ex) {
+        log.error("User-service error status={} body={}", ex.status(), ex.contentUTF8(), ex);
+        String message = switch (ex.status()) {
+            case 401, 403 ->
+                    "Registration could not finish (profile service rejected the request). Please try again later or contact support.";
+            case 404 ->
+                    "Registration service endpoint was not found. Please contact support.";
+            case 409 ->
+                    "This account already exists. Try signing in instead.";
+            default ->
+                    "We could not finish setting up your profile. Please try again in a few minutes.";
+        };
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", message));
+    }
+
     /** DB constraint / column issues — never expose SQL to clients. */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleDataIntegrity(DataIntegrityViolationException ex) {
@@ -100,27 +119,81 @@ public class AuthController {
                 "We could not create your account. Please try again or pick a different username."));
     }
 
-    /** Safe messages for known business errors; hide internal/DB details for anything else. */
+    /**
+     * Known safe messages pass through; JDBC/Hibernate/SQL text is hidden.
+     * Walks the cause chain so wrapped {@link DataIntegrityViolationException}s are handled.
+     */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntime(RuntimeException ex) {
-        String raw = ex.getMessage();
-        if (raw == null || looksLikeInfrastructureError(raw)) {
-            log.error("Unhandled registration/auth error", ex);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                    "message", "Something went wrong. Please try again later."));
+        DataIntegrityViolationException div = findInCause(ex, DataIntegrityViolationException.class);
+        if (div != null) {
+            return handleDataIntegrity(div);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", raw));
+
+        String raw = deepestMessage(ex);
+        if ("User already exists".equals(raw)) {
+            return ResponseEntity.badRequest().body(Map.of("message", raw));
+        }
+        if (raw == null || looksLikeInfrastructureError(raw)) {
+            log.error("Registration/auth error", ex);
+            return ResponseEntity.badRequest().body(Map.of("message", registrationHint(raw)));
+        }
+        return ResponseEntity.badRequest().body(Map.of("message", raw));
+    }
+
+    private static String registrationHint(String raw) {
+        if (raw == null) {
+            return "Something went wrong. Please try again later.";
+        }
+        String m = raw.toLowerCase();
+        if (m.contains("could not execute")
+                || m.contains("field '")
+                || m.contains("email_verified")
+                || m.contains("doesn't have a default value")) {
+            return "We could not save your account (server data configuration). Please try again later or contact support.";
+        }
+        return "Something went wrong. Please try again later.";
+    }
+
+    private static <T extends Throwable> T findInCause(Throwable ex, Class<T> type) {
+        Throwable t = ex;
+        while (t != null) {
+            if (type.isInstance(t)) {
+                return type.cast(t);
+            }
+            t = t.getCause();
+        }
+        return null;
+    }
+
+    /** Prefer the deepest non-blank message (often the JDBC root cause). */
+    private static String deepestMessage(Throwable ex) {
+        String best = ex.getMessage();
+        Throwable t = ex.getCause();
+        while (t != null) {
+            if (t.getMessage() != null && !t.getMessage().isBlank()) {
+                best = t.getMessage();
+            }
+            Throwable next = t.getCause();
+            if (next == t) {
+                break;
+            }
+            t = next;
+        }
+        return best;
     }
 
     private static boolean looksLikeInfrastructureError(String msg) {
         String m = msg.toLowerCase();
-        return m.contains("sql")
+        return m.contains("could not execute")
+                || m.contains("java.sql.")
+                || m.contains("sqlexception")
                 || m.contains("jdbc")
                 || m.contains("hibernate")
-                || m.contains("could not execute")
                 || m.contains("constraint")
-                || m.contains("field '")
-                || m.contains("column ");
+                || m.contains("duplicate entry")
+                || (m.contains("field '") && m.contains("default"))
+                || m.contains("email_verified");
     }
 
     // Change password by user

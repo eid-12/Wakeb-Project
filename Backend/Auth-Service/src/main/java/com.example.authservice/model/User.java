@@ -31,6 +31,11 @@ public class User implements UserDetails, Serializable {
     @Column(nullable = false, columnDefinition = "boolean default true") // Flag to indicate user role
     private Boolean isUser = true;
 
+    /** Persisted as email_verified — must be set on insert (DB column has no default in some deployments). */
+    @Column(name = "email_verified", nullable = false)
+    @Builder.Default
+    private Boolean emailVerified = false;
+
     /* ------------ UserDetails Implementation ------------ */
 
     // Return user authorities (roles)

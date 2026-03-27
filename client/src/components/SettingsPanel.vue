@@ -23,16 +23,16 @@
       <!-- 2) Account -->
       <div>
         <h2 class="font-semibold mb-3">Account</h2>
-        <button class="btn-setting" @click="showPasswordModal = true">
+        <button type="button" class="btn-setting" @click="showPasswordModal = true">
           <i class="fas fa-key"></i> Change Password
         </button>
-        <button class="btn-setting" @click="showEmailModal = true">
+        <button type="button" class="btn-setting" @click="openEmailModal">
           <i class="fas fa-envelope"></i> Change Email
         </button>
-        <button class="btn-setting" @click="showUsernameModal = true">
+        <button type="button" class="btn-setting" @click="showUsernameModal = true">
           <i class="fa-solid fa-user-pen"></i> Change Username
         </button>
-        <button class="btn-setting-danger" :disabled="deleting" @click="deleteAccount">
+        <button type="button" class="btn-setting-danger" :disabled="deleting" @click="deleteAccount">
           <i class="fas fa-trash-alt"></i> {{ deleting ? 'Deleting…' : 'Delete Account' }}
         </button>
       </div>
@@ -53,7 +53,7 @@
           <input type="checkbox" v-model="settings.locationTracking" />
           Enable Location Tracking
         </label>
-        <button @click="manageSearchData" class="mt-2 border px-3 py-1 rounded w-full">
+        <button type="button" @click="manageSearchData" class="mt-2 border px-3 py-1 rounded w-full">
           Manage Search Data
         </button>
       </div>
@@ -89,9 +89,23 @@
     <div class="modal-card">
       <h3 class="modal-heading text-xl font-semibold mb-4">Change Password</h3>
 
-
-      <input v-model="passwordForm.current" :type= "text" placeholder="Current password" class="input " />
- 
+      <div class="relative">
+        <input
+          v-model="passwordForm.current"
+          :type="showPwd.current ? 'text' : 'password'"
+          placeholder="Current password"
+          class="input pr-10"
+          autocomplete="current-password"
+        />
+        <button
+          type="button"
+          class="eye-btn"
+          @click="showPwd.current = !showPwd.current"
+          :aria-label="showPwd.current ? 'Hide password' : 'Show password'"
+        >
+          <i :class="showPwd.current ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+        </button>
+      </div>
 
     <div class="relative">
 
@@ -129,8 +143,23 @@
     <div class="modal-card">
       <h3 class="modal-heading text-xl font-semibold mb-4">Change Email</h3>
 
-      <input v-model="emailForm.newEmail" type="email"    placeholder="New email address" class="input" />
-      <input v-model="emailForm.oldEmail" type="email" placeholder="Current Email or Confirm "  class="input" />
+      <label class="block text-sm text-gray-600 mb-1">Current email</label>
+      <input
+        v-model="emailForm.oldEmail"
+        type="email"
+        autocomplete="email"
+        placeholder="Your current email on file"
+        class="input"
+        :disabled="!user?.email"
+      />
+      <label class="block text-sm text-gray-600 mb-1 mt-2">New email</label>
+      <input
+        v-model="emailForm.newEmail"
+        type="email"
+        autocomplete="off"
+        placeholder="New email address"
+        class="input"
+      />
 
       <div class="modal-actions">
         <button type="button" class="btn-cancel" @click="closeEmailModal">Cancel</button>
@@ -192,7 +221,7 @@ const settings = reactive({
   syncPlaces: false,
   exportFavorites: false
 });
-const showPwd = reactive({ new: false, confirm: false });
+const showPwd = reactive({ current: false, new: false, confirm: false });
 
 const { user, setUser } = useUser();
 
@@ -242,23 +271,53 @@ async function submitPassword() {
 const showEmailModal = ref(false);
 const emailForm = reactive({ newEmail: '', oldEmail: '' });
 
+function openEmailModal() {
+  emailForm.oldEmail = user.value?.email?.trim() || '';
+  emailForm.newEmail = '';
+  showEmailModal.value = true;
+}
+
 function closeEmailModal() {
   showEmailModal.value = false;
   Object.assign(emailForm, { newEmail: '', oldEmail: '' });
 }
 
 async function submitEmail() {
-if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailForm.newEmail)) {
-  showAlert({ type: 'warning', title: 'Notice', message: 'Invalid email format!' });
-  return;
-}
+  const newEmail = emailForm.newEmail.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+    showAlert({ type: 'warning', title: 'Notice', message: 'Invalid new email format.' });
+    return;
+  }
+
+  const currentAccountEmail = user.value?.email?.trim();
+  const oldEmailInput = emailForm.oldEmail.trim();
+
+  if (currentAccountEmail) {
+    if (!oldEmailInput) {
+      showAlert({ type: 'warning', title: 'Notice', message: 'Enter your current email to confirm the change.' });
+      return;
+    }
+    if (oldEmailInput !== currentAccountEmail) {
+      showAlert({ type: 'warning', title: 'Notice', message: 'Current email does not match your account.' });
+      return;
+    }
+  }
 
   try {
-    await changeEmail(emailForm.newEmail, emailForm.oldEmail);
+    await changeEmail({
+      newEmail,
+      oldEmail: currentAccountEmail ? oldEmailInput : null,
+    });
     showAlert({ type: 'success', title: 'Updated', message: 'Email updated successfully ✔' });
     closeEmailModal();
+    const u = await getUser();
+    setUser(u);
   } catch (e) {
-    showAlert({ type: 'danger', title: 'Error', message: e.response?.data?.message || 'Error updating email' });
+    const msg =
+      typeof e.response?.data === 'string'
+        ? e.response.data
+        : e.response?.data?.message || 'Error updating email';
+    showAlert({ type: 'danger', title: 'Error', message: msg });
   }
 }
 

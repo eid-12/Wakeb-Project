@@ -1,45 +1,52 @@
 const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 
-/** * 1. إعدادات البروكسي (يجب أن تكون قبل bodyParser) 
- * هذا الترتيب يضمن أن البيانات تمر مباشرة للجافا دون أن "تتعلق" أو تستهلك
+/**
+ * Proxy targets (override per environment — e.g. Railway / Docker service names).
+ * Defaults match the existing deployment hostnames so production keeps working.
  */
+const AUTH_SERVICE_ORIGIN =
+  process.env.AUTH_SERVICE_ORIGIN || 'http://wakeb-application-auth-service-1:8080';
+const API_GATEWAY_ORIGIN =
+  process.env.API_GATEWAY_ORIGIN || 'http://wakeb-application-api-gateway-1:8080';
 
-// بروكسي خدمة الأوث (Auth Service)
-app.use('/api/auth', createProxyMiddleware({
-    // نضع المسار كاملاً كما طلبت لضمان وصوله للجافا بشكل سليم
-    target: 'http://wakeb-application-auth-service-1:8080/api/auth', 
+/** Order matters: register /api/auth before /api so auth hits the auth service first. */
+app.use(
+  '/api/auth',
+  createProxyMiddleware({
+    target: `${AUTH_SERVICE_ORIGIN}/api/auth`,
     changeOrigin: true,
-    // نحذف البادئة لكي لا تظهر مكررة في الرابط النهائي
-    pathRewrite: { '^/api/auth': '' }, 
+    pathRewrite: { '^/api/auth': '' },
     proxyTimeout: 120000,
-    timeout: 120000
-}));
+    timeout: 120000,
+  })
+);
 
-// بروكسي بوابة التطبيق (API Gateway)
-app.use('/api', createProxyMiddleware({
-    target: 'http://wakeb-application-api-gateway-1:8080/api',
+app.use(
+  '/api',
+  createProxyMiddleware({
+    target: `${API_GATEWAY_ORIGIN}/api`,
     changeOrigin: true,
-    pathRewrite: { '^/api': '' }, 
+    pathRewrite: { '^/api': '' },
     proxyTimeout: 120000,
-    timeout: 120000
-}));
+    timeout: 120000,
+  })
+);
 
-/** * 2. إعدادات معالجة البيانات (تأتي بعد البروكسي)
- */
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-/** * 3. ملفات الفرونت إند (Vue.js Dist)
- */
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(3000, () => console.log('✅ Proxy is running and forwarding directly with optimized order'));
+const port = Number(process.env.PORT) || 3000;
+app.listen(port, () => {
+  console.log(`Server listening on ${port} (auth → ${AUTH_SERVICE_ORIGIN}, gateway → ${API_GATEWAY_ORIGIN})`);
+});

@@ -120,10 +120,8 @@ form.append('description', place.value.description);
 form.append('category', place.value.category);
 form.append('latitude', String(place.value.latitude));
 form.append('longitude', String(place.value.longitude));
-if (imageFile.value) form.append('image', imageFile.value);
-
-  if (imageFile.value) {
-    form.append('image', imageFile.value)   
+if (imageFile.value) {
+    form.append('image', imageFile.value);
   }
   try {
 const res = await submitPlac(form) 

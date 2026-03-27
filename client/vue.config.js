@@ -6,6 +6,9 @@ module.exports = defineConfig({
   outputDir: path.resolve(__dirname, "dist"),
   publicPath: "./",
   devServer: {
-    proxy: { "/api": { target: "http://localhost:3000", changeOrigin: true } }
-  }
+    // Forward /api and /api/auth to the Express proxy (same as production) or set to gateway URL in .env.development.local
+    proxy: {
+      "/api": { target: "http://localhost:3000", changeOrigin: true },
+    },
+  },
 });

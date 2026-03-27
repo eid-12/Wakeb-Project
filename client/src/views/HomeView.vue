@@ -120,6 +120,7 @@ import leaflet from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { searchpo ,addToFavorite } from '@/api/user';
+import { MAPBOX_ACCESS_TOKEN, MAPBOX_GEOCODING_BASE } from '@/config/env';
 
 
 
@@ -169,7 +170,7 @@ let dest  = "";
 
 let map;         
 let mapInitialized = false;
-let placeName = '';
+let placeName = [];
 
 /*************************
  * Helper functions
@@ -415,23 +416,29 @@ onMounted( () => {
   const openTopo = leaflet.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data © OpenTopoMap contributors'
   });
-  const mapboxStreets = leaflet.tileLayer(`https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${process.env.VUE_APP_API_KEY}`, {
-    id        : 'mapbox/streets-v11',
-    tileSize  : 512,
-    zoomOffset: -1,
-    attribution: 'Mapbox © OpenStreetMap'
-  });
+  const layerMap = {
+    OpenStreetMap: openStreetMap,
+    'Esri Imagery (Satellite)': esriImagery,
+    'CartoDB Positron': cartoLight,
+    'CartoDB Dark': cartoDark,
+    'OpenTopoMap': openTopo,
+  };
+
+  if (MAPBOX_ACCESS_TOKEN) {
+    layerMap['Mapbox Streets'] = leaflet.tileLayer(
+      `https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${MAPBOX_ACCESS_TOKEN}`,
+      {
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1,
+        attribution: 'Mapbox © OpenStreetMap',
+      }
+    );
+  }
 
   openStreetMap.addTo(map); // default
 
-  leaflet.control.layers({
-    OpenStreetMap: openStreetMap,
-    'Esri Imagery (Satellite)' : esriImagery,
-    'CartoDB Positron'         : cartoLight,
-    'CartoDB Dark'             : cartoDark,
-    'OpenTopoMap '               : openTopo,
-    'Mapbox Streets'           : mapboxStreets
-  }).addTo(map);
+  leaflet.control.layers(layerMap).addTo(map);
 
   map.whenReady(() => {
     removeRoute();
@@ -445,12 +452,16 @@ map.on('click', async (e) => {
    ({ lat, lng } = e.latlng);
 
   try {
-    const resp = await fetch(
-      `${process.env.VUE_APP_MAPBOX_API}${lng},${lat}.json` +
-      `?access_token=${process.env.VUE_APP_API_KEY}&language=ar`
-    );
+    if (!MAPBOX_ACCESS_TOKEN) {
+      placeName = [];
+    } else {
+    const geocodeUrl = `${MAPBOX_GEOCODING_BASE}/${lng},${lat}.json?access_token=${encodeURIComponent(
+      MAPBOX_ACCESS_TOKEN
+    )}&language=ar`;
+    const resp = await fetch(geocodeUrl);
     const data = await resp.json();
- placeName = data.features?.map(f => f.place_name) ?? [];
+    placeName = data.features?.map(f => f.place_name) ?? [];
+    }
   } catch (err) {
     console.warn('Reverse-geocoding failed:', err);
           selectedPlace.value = { lat, lng };

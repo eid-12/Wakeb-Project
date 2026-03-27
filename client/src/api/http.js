@@ -1,15 +1,20 @@
 import axios from 'axios';
+import { API_GATEWAY_BASE, AUTH_API_BASE, MAPBOX_GEOCODING_BASE } from '@/config/env';
 
+/**
+ * Axios instances for backend integration.
+ * Use relative URLs in production (same origin as Express proxy) unless overrides are set.
+ */
 export const API_GATEWAY = axios.create({
-  baseURL: process.env.VUE_APP_API_GATEWAY_URL,
+  baseURL: API_GATEWAY_BASE,
   withCredentials: true,
 });
 
 export const AUTH_API = axios.create({
-  baseURL: process.env.VUE_APP_AUTH_API_URL,
+  baseURL: AUTH_API_BASE,
   withCredentials: true,
 });
 
 export const MAPBOX_API = axios.create({
-  baseURL: process.env.VUE_APP_MAPBOX_API,
+  baseURL: `${MAPBOX_GEOCODING_BASE}/`,
 });

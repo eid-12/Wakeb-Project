@@ -46,7 +46,7 @@
 
 
     <!-- Submit -->
-    <button class="sign-in-btn" @click="handleSubmit">
+    <button type="button" class="sign-in-btn" @click="handleSubmit">
       {{ isRegister ? 'Sign Up' : 'Sign In' }}
     </button>
 
@@ -69,7 +69,7 @@ import { ref ,reactive} from 'vue';
 import { useAlerts } from '@/composables/useAlerts';
 import { registerUser, loginUser, getUser, useUser ,deleteTokenCookie } from '@/api/user'
 
-const { showAlert, showConfirm } = useAlerts();
+const { showAlert } = useAlerts();
 const { setUser, clearUser } = useUser();
 
 const emit = defineEmits(['close', 'success']);
@@ -162,8 +162,11 @@ async function handleSubmit() {
     }
     try {
       await registerUser({ username, password });
-      showAlert({ type: 'success', title: 'Account Created', message: 'Account created! Please sign in.' });
+      const u = await getUser();
+      setUser(u);
+      showAlert({ type: 'success', title: 'Account Created', message: 'Welcome! You are signed in.' });
       emit('success');
+      resetForm();
     } catch (err) {
       const msg = err.response?.data || 'Registration failed. Please try again.';
       showAlert({ type: 'danger', title: 'Registration Error', message: msg });

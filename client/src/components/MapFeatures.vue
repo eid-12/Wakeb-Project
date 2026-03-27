@@ -27,7 +27,7 @@
             >
               <i class="fas fa-map-marker-alt"></i>
               <p class="result-text">
-                {{ result.place_name_en }}
+                {{ result.place_name || result.place_name_en || result.text }}
                 <span v-if="result.distance">
                   – {{ result.distance.toFixed(1) }} km
                 </span>
@@ -40,13 +40,13 @@
         <div v-if="selectedResult" class="selected-result">
           <i @click="removeResults" class="close-icon far fa-times-circle"></i>
           <i @click="$emit('addRoute')" class="route-icon fas fa-route"></i>
-          <h2 class="selected-title">{{ selectedResult.text }}</h2>
-          <p class="selected-subtext">
-            {{ selectedResult.properties.address }},
-            {{ selectedResult.city }},
-            {{ selectedResult.state }}
+          <h2 class="selected-title">
+            {{ selectedResult.place_name || selectedResult.text }}
+          </h2>
+          <p v-if="selectedResultSubtitle" class="selected-subtext">
+            {{ selectedResultSubtitle }}
           </p>
-          <p class="selected-category">
+          <p v-if="selectedResult.properties?.category" class="selected-category">
             {{ selectedResult.properties.category }}
           </p>
         </div>
@@ -70,7 +70,7 @@
 <script setup>
 /* global defineProps, defineEmits ,defineExpose*/
 
-import { ref, onUnmounted } from "vue";
+import { ref, onUnmounted, computed } from "vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
 import { searchPlace , searchpo } from '@/api/user.js'; 
 
@@ -93,6 +93,13 @@ const searchQuery    = ref("");
 const searchData     = ref(null);
 const queryTimeout   = ref(null);
 const selectedResult = ref(null);
+
+const selectedResultSubtitle = computed(() => {
+  const f = selectedResult.value;
+  if (!f) return "";
+  const parts = [f.properties?.address, f.city, f.state].filter(Boolean);
+  return parts.length ? parts.join(", ") : "";
+});
 
 function haversineDistance(c1, c2) {
   const toRad = v => (v * Math.PI) / 180;
@@ -164,10 +171,9 @@ const selectResult = async (feature) => {
 
   emit('plotResult', feature.geometry);
 
-  if (feature?.place_name) {
-    await searchpo(feature.place_name);
-  } else {
-    console.warn('place_name NO esixt feature', feature);
+  const label = feature?.place_name || feature?.text;
+  if (label) {
+    await searchpo(label);
   }
 };
 

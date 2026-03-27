@@ -1,6 +1,0 @@
--- Optional MySQL hardening for `users` (Auth-Service). The JPA entity sends values on INSERT;
--- these ALTERs help if other tools insert rows without all columns.
---
--- ALTER TABLE users MODIFY COLUMN email_verified TINYINT(1) NOT NULL DEFAULT 0;
--- ALTER TABLE users MODIFY COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1;
--- ALTER TABLE users MODIFY COLUMN created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6);

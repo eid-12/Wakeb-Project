@@ -26,6 +26,13 @@ public class User implements UserDetails, Serializable {
     @Column(unique = true, nullable = false, length = 50)
     private String username;
 
+    /**
+     * MySQL often has NOT NULL {@code email} with no default. The product does not collect email;
+     * we persist a synthetic value derived from username so INSERT always succeeds and stays unique.
+     */
+    @Column(name = "email", nullable = false, length = 255)
+    private String email;
+
     @Column(nullable = false, length = 60)
     private String password;
 
@@ -64,6 +71,9 @@ public class User implements UserDetails, Serializable {
         }
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+        if (email == null || email.isBlank()) {
+            email = username != null ? username + "@noreply.local" : "pending@noreply.local";
         }
     }
 

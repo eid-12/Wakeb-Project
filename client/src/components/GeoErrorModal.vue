@@ -6,8 +6,8 @@
         To take advantage of this application's features, please ensure location services
         are enabled.
       </p>
-      <button @click="$emit('closeGeoError')" class="geo-modal-button">
-        Close
+      <button type="button" @click="$emit('closeGeoError')" class="geo-modal-button">
+        OK
       </button>
     </div>
   </div>
@@ -21,48 +21,68 @@ export default {
 
 <style scoped>
 .geo-modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100%;
-  z-index: 10;
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding-top: 125px;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 100000;
+  align-items: center;
+  padding: 1.5rem;
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+  background-color: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .geo-modal-content {
   display: flex;
   flex-direction: column;
-  background-color: white;
-  width: 80%;
-  max-width: 450px;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
+  background-color: #fff;
+  width: 100%;
+  max-width: 420px;
+  padding: 1.5rem 1.35rem;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.06),
+    0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .geo-modal-title {
-  font-size: 1.125rem;
-  margin-bottom: 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #b91c1c;
+  margin: 0 0 0.5rem;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .geo-modal-message {
   font-size: 0.875rem;
-  margin-bottom: 1rem;
+  color: #475569;
+  margin: 0 0 1.25rem;
+  line-height: 1.55;
 }
 
 .geo-modal-button {
-  align-self: flex-start;
-  padding: 0.5rem 1rem;
-  background-color: #ef4444; /* Red-500 */
+  align-self: flex-end;
+  padding: 0.55rem 1.15rem;
+  background-color: #1e4d41;
   color: white;
   font-size: 0.875rem;
+  font-weight: 600;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.geo-modal-button:hover {
+  background-color: #166534;
+}
+
+.geo-modal-button:focus-visible {
+  outline: 2px solid #0d9488;
+  outline-offset: 2px;
 }
 </style>

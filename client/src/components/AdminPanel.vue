@@ -3,14 +3,15 @@
     <h1 class="text-2xl font-bold mb-4 text-emerald-700">Admin Dashboard</h1>
 
     <!-- Stats -->
-    <div   class="grid grid-cols-3 gap-4 text-center">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
       <div class="bg-gray-100 p-4 rounded">👥 Total Users: {{ totalElements  }}</div>
       <div class="bg-green-100 p-4 rounded">🟢 Active Users: {{activeUserCount }}   </div>
       <div class="bg-blue-100 p-4 rounded">🛡️ Admins: {{ activeAdminCount}}</div>
     </div>
 
     <!-- Users Table -->
-    <table class="w-full mt-6 border text-center">
+    <div class="admin-table-wrap overflow-x-auto -mx-2 px-2">
+    <table class="w-full mt-6 border text-center min-w-[640px]">
       <thead>
         <tr class="bg-gray-200">
           <th>Name</th>
@@ -52,6 +53,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
 
     <!-- Pagination -->
 <div class="flex justify-center items-center gap-4 mt-6">

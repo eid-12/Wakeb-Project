@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  #app {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+}
+
 .swal2-cancel {
   background-color: #6b7280 !important; /* لون الخلفية */
   color: white !important;              /* لون النص */

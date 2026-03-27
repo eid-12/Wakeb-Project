@@ -1,23 +1,24 @@
 <template>
 
 <div class="page-container" >
-     <AlertsContainer />
-
   <!-- Navbar -->  
-    <nav class="navbar">
-      <div class="navbar-left"><h1 class="logo">Wakeb Maps</h1></div>
+    <nav class="navbar" aria-label="Main">
+      <div class="navbar-left">
+        <h1 class="logo">Wakeb Maps</h1>
+      </div>
       <div class="navbar-right">
         <span v-if="showNavbarSuccess" class="status-message">Success! ✓</span>
           
-          <button v-if="isLoggedIn" class="user-flag" @click="selectedMenu = 'settings'">
-          <i class="fa-solid fa-user"></i> {{ user?.name }}
+          <button v-if="isLoggedIn" type="button" class="user-flag" @click="selectedMenu = 'settings'">
+          <i class="fa-solid fa-user" aria-hidden="true"></i>
+          <span class="user-flag__name">{{ user?.name }}</span>
           </button>
 
-        <button id="Logout" v-if="isLoggedIn" class="logout-button" @click="logout">
-          <i class="fas fa-sign-out-alt" ></i> Logout
+        <button id="Logout" v-if="isLoggedIn" type="button" class="logout-button" @click="logout">
+          <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
         </button>
-        <button v-else class="logout-button" @click="showLogin = true">
-          <i class="fas fa-user"></i> Login
+        <button v-else type="button" class="logout-button" @click="showLogin = true">
+          <i class="fas fa-user" aria-hidden="true"></i> Login
         </button>
       </div>
     </nav>
@@ -119,7 +120,6 @@ import leaflet from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { searchpo ,addToFavorite } from '@/api/user';
-import AlertsContainer from '@/components/AlertsContainer.vue';
 
 
 
@@ -507,59 +507,293 @@ btn.addEventListener('click', (evt) => {
 
 <style scoped>
 /*************************
- * Keep your existing Tailwind-like styles
+ * Layout & chrome
  *************************/
-.page-container { height: 100vh; display: flex; flex-direction: column; position: relative;   user-select: none;}
-.navbar { background-color: #1e4d41; color: #f1f5f9; display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; }
-.logo { font-size: 1.25rem; font-weight: bold; }
-.navbar-right { display: flex; align-items: center; gap: 1rem; }
-.status-message { font-size: 0.9rem; color: #d1fae5; }
-.logout-button { background: none; border: none; color: inherit; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 0.25rem; }
-.logout-button i { font-size: 1rem; }
-.logout-button:hover{scale: 1.25;}
-#Logout:hover { color: #e53935; }
-.content-container { display: flex; flex-direction: row; height: calc(100vh - 64px); }
-.login-panel { width: 320px; height: 100%; background: #1e4d41; color: white; z-index: 600; transition: all 0.3s ease; }
-.side-dashboard { width: 220px; background-color: #083c35; color: #fff; padding: 1rem; }
-.dashboard-menu { list-style: none; padding: 0; margin: 0; }
-.dashboard-menu li { padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
-.dashboard-menu li:hover { background-color: #115e54; }
-.dashboard-menu li.active { background-color: #0d6b5e; }
-.map-and-overlay {height: 100%; flex: 1; position: relative; }
-#map, .map { width: 100%; height: 100%; }
-.placeholder-page { width: 100%; height: 100%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #1e4d41; font-weight: bold; }
-.search-overlay { position: absolute; top: 16px; left: 16px; z-index: 500; }
-.custom-layer-control { position: absolute; bottom: 30px; right: 30px; z-index: 1000; transform: scale(1.1); }
+.page-container {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  user-select: none;
+}
 
-/* .map-blur{
-  filter: blur(2px) brightness(.8);
-  transition: filter .3s;
-} */
+.navbar {
+  background-color: #1e4d41;
+  color: #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
 
-/* حركة fade للترانزيشن */
+.logo {
+  font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.status-message {
+  font-size: 0.875rem;
+  color: #a7f3d0;
+  font-weight: 500;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.logout-button:focus-visible {
+  outline: 2px solid #a7f3d0;
+  outline-offset: 2px;
+}
+
+.logout-button i {
+  font-size: 1rem;
+}
+
+#Logout:hover {
+  color: #fecaca;
+}
+
+.content-container {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+}
+
+.login-panel {
+  width: 320px;
+  max-width: 100%;
+  flex-shrink: 0;
+  height: 100%;
+  background: #1e4d41;
+  color: white;
+  z-index: 600;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+.side-dashboard {
+  width: 220px;
+  flex-shrink: 0;
+  background-color: #083c35;
+  color: #fff;
+  padding: 0.75rem 0.65rem;
+  overflow: hidden;
+}
+
+.dashboard-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-menu li {
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.35rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.dashboard-menu li:hover {
+  background-color: #115e54;
+}
+
+.dashboard-menu li.active {
+  background-color: #0d6b5e;
+  font-weight: 600;
+}
+
+.map-and-overlay {
+  height: 100%;
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+#map,
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+.placeholder-page {
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #1e4d41;
+  font-weight: bold;
+}
+
+.search-overlay {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 500;
+  pointer-events: none;
+}
+
+.search-overlay > * {
+  pointer-events: auto;
+}
+
+.custom-layer-control {
+  position: absolute;
+  bottom: 24px;
+  right: 12px;
+  z-index: 1000;
+}
+
+@media (min-width: 768px) {
+  .search-overlay {
+    top: 16px;
+    left: 16px;
+    right: auto;
+  }
+
+  .custom-layer-control {
+    bottom: 30px;
+    right: 24px;
+  }
+}
+
 .fade-enter-active,
-.fade-leave-active{ transition: opacity .35s }
+.fade-leave-active {
+  transition: opacity 0.35s ease;
+}
+
 .fade-enter-from,
-.fade-leave-to{ opacity: 0 }
-.welcome-card h1{
-  font-size: 32px;
-  margin-bottom: .75rem;
-  color:#1f2937;            /* أغمق لوضوح أعلى */
-  text-shadow: 0 1px 2px rgba(0,0,0,.15);
+.fade-leave-to {
+  opacity: 0;
 }
-.welcome-card p{
-  font-size: 18px;
-line-height: 1.9;
-  color:#374151;
+
+.user-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(167, 243, 208, 0.35);
+  color: #ecfdf5;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  max-width: 160px;
+  min-width: 0;
 }
-.user-flag{
-  @apply flex items-center gap-2 px-3 py-1 rounded
-         border border-emerald-600 text-emerald-700
-         hover:bg-emerald-50 transition;
-  background: transparent;
+
+.user-flag__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
-.user-flag i{ @apply text-sm; }
+
+.user-flag:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(167, 243, 208, 0.55);
+}
+
+.user-flag:focus-visible {
+  outline: 2px solid #a7f3d0;
+  outline-offset: 2px;
+}
+
+.user-flag i {
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 480px) {
+  .user-flag {
+    max-width: 220px;
+  }
+}
+
 .leaflet-popup-content,
-.leaflet-popup-content * { pointer-events: auto; }
+.leaflet-popup-content * {
+  pointer-events: auto;
+}
+
+@media (max-width: 767px) {
+  .content-container {
+    flex-direction: column;
+  }
+
+  .side-dashboard {
+    width: 100%;
+    order: 1;
+    padding: 0.5rem 0.35rem;
+  }
+
+  .dashboard-menu {
+    display: flex;
+    flex-direction: row;
+    gap: 0.35rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+    scrollbar-width: thin;
+  }
+
+  .dashboard-menu li {
+    flex: 0 0 auto;
+    margin-bottom: 0;
+    white-space: nowrap;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .map-and-overlay {
+    order: 2;
+    flex: 1;
+    min-height: 280px;
+  }
+
+  .content-container.with-login .login-panel {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 650;
+  }
+}
 
 </style>  

@@ -59,7 +59,7 @@
     </p>
 
     <!-- Close -->
-    <button class="close-btn" @click="emit('close')">×</button>
+    <button type="button" class="close-btn" @click="emit('close')" aria-label="Close">×</button>
   </div>
 </template>
 
@@ -223,6 +223,11 @@ defineExpose({
   outline: none;
   color: white;
   flex: 1;
+  min-width: 0;
+}
+
+.input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .sign-in-btn {
@@ -234,10 +239,16 @@ defineExpose({
   border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 0.25rem;
 }
 
 .sign-in-btn:hover {
   background-color: #bf763d;
+}
+
+.sign-in-btn:focus-visible {
+  outline: 2px solid #fde68a;
+  outline-offset: 2px;
 }
 
 .register-text {
@@ -257,9 +268,22 @@ defineExpose({
   background: none;
   border: none;
   font-size: 1.6rem;
-  color: white;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
-  
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.close-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.close-btn:focus-visible {
+  outline: 2px solid #fde68a;
+  outline-offset: 2px;
 }
 
 

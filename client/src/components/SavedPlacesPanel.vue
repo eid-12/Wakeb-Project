@@ -72,9 +72,9 @@ onMounted(() => {
   left: 50%;
   transform: translate(-50%, -50%);
 
-  width: 90%;
+  width: min(92vw, 800px);
   max-width: 800px;
-  min-width: 400px;
+  min-width: 0;
 
   max-height: 80vh;
   overflow-y: auto;

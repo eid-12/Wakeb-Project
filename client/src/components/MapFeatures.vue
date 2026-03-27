@@ -40,7 +40,7 @@
         <div v-if="selectedResult" class="selected-result">
           <i @click="removeResults" class="close-icon far fa-times-circle"></i>
           <i @click="$emit('addRoute')" class="route-icon fas fa-route"></i>
-          <h1 class="selected-removeResult-title">{{ selectedResult.text }}</h1>
+          <h2 class="selected-title">{{ selectedResult.text }}</h2>
           <p class="selected-subtext">
             {{ selectedResult.properties.address }},
             {{ selectedResult.city }},
@@ -229,9 +229,15 @@ defineExpose({
   font-size: 0.875rem;
   width: 100%;
   border-radius: 0.5rem;
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   outline: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
 }
 
 .search-icon {
@@ -250,10 +256,12 @@ defineExpose({
 }
 
 .search-results {
-  max-height: 200px;
+  max-height: min(240px, 45vh);
   overflow-y: auto;
   background: white;
   border-radius: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .result-item {
@@ -262,12 +270,12 @@ defineExpose({
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition: background-color 0.15s, color 0.15s;
 }
 
 .result-item:hover {
-  background-color: #475569;
-  color: white;
+  background-color: #ecfdf5;
+  color: #064e3b;
 }
 
 .result-text {
@@ -275,10 +283,13 @@ defineExpose({
 }
 
 .selected-result {
+  position: relative;
   margin-top: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
   background: white;
   border-radius: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .close-icon {
@@ -301,8 +312,12 @@ defineExpose({
 }
 
 .selected-title {
-  font-size: 1.125rem;
-  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+  color: #0f172a;
+  line-height: 1.35;
+  padding-right: 0.5rem;
 }
 
 .selected-subtext,

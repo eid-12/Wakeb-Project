@@ -12,9 +12,9 @@
           <option>Public</option><option>Private</option>
           <option>Confidential</option><option>Top Secret</option>
         </select>
-        <div class="flex gap-4">
-          <input required  v-model="place.latitude" placeholder="Latitude" class="input" />
-          <input required  v-model="place.longitude" placeholder="Longitude" class="input" />
+        <div class="coord-row flex flex-col sm:flex-row gap-4">
+          <input required  v-model="place.latitude" placeholder="Latitude" class="input flex-1 min-w-0" />
+          <input required  v-model="place.longitude" placeholder="Longitude" class="input flex-1 min-w-0" />
         </div>
         <input ref="fileInput" type="file" @change="handleImageUpload" class="input-file" accept="image/*"/>
         <div v-if="imageFile" class="text-sm mt-2 flex items-center gap-3">

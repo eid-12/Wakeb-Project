@@ -31,10 +31,21 @@ public class User implements UserDetails, Serializable {
     @Column(nullable = false, columnDefinition = "boolean default true")
     private Boolean isUser = true;
 
+    /**
+     * Required by existing MySQL schema (NOT NULL, no DEFAULT). Not shown in UI — login/register stay
+     * username + password only. Hibernate must include this column in INSERT or MySQL rejects the row.
+     */
+    @Column(name = "email_verified", nullable = false)
+    @Builder.Default
+    private Boolean emailVerified = false;
+
     @PrePersist
     void applySignupDefaults() {
         if (isUser == null) {
             isUser = true;
+        }
+        if (emailVerified == null) {
+            emailVerified = false;
         }
     }
 

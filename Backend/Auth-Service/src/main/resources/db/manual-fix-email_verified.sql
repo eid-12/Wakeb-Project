@@ -1,10 +1,8 @@
--- إلغاء شرط عمود email_verified من جدول users (تسجيل الدخول: اسم مستخدم + كلمة مرور فقط)
--- نفّذ على قاعدة Auth-Service (مثلاً mapping_db).
-
--- MySQL 8.0.29+ : حذف العمود إن وُجد
-ALTER TABLE users DROP COLUMN IF EXISTS email_verified;
-
--- إن كان إصدار MySQL أقدم ولا يدعم IF EXISTS، استخدم أحد الخيارين يدوياً:
--- ALTER TABLE users DROP COLUMN email_verified;
--- أو إبقاء العمود لكن بدون إلزام (لا يُشترط قيمة):
--- ALTER TABLE users MODIFY COLUMN email_verified TINYINT(1) NULL DEFAULT NULL;
+-- Optional cleanup: if you later add DEFAULT 0 on MySQL or drop this column, you can remove
+-- `emailVerified` from the JPA `User` entity. Until then, the app sends email_verified = 0 on INSERT.
+--
+-- To drop the column after a DB default exists (optional):
+-- ALTER TABLE users DROP COLUMN IF EXISTS email_verified;
+--
+-- To add a DB default so legacy clients are safe (optional):
+-- ALTER TABLE users MODIFY COLUMN email_verified TINYINT(1) NOT NULL DEFAULT 0;

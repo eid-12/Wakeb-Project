@@ -34,6 +34,7 @@ public class AuthService {
                 .username(req.username())
                 .password(encoder.encode(req.password()))
                 .isUser(true)
+                .emailVerified(false)
                 .build();
         userRepo.save(user);
 

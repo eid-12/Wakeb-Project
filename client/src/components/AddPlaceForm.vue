@@ -1,7 +1,9 @@
 <template>
-  <section class="flex flex-col items-center justify-start h-full py-12">
-    <div class="w-full md:max-w-3xl bg-white shadow-lg rounded-xl p-8">
-      <h1 class="text-2xl font-bold text-center mb-8 text-emerald-700">Add Unlisted Place</h1>
+  <section class="flex flex-col items-center justify-start min-h-full w-full py-8 md:py-12 px-4 overflow-y-auto">
+    <div
+      class="w-full md:max-w-3xl bg-white dark:bg-slate-800/95 dark:border dark:border-slate-600/60 shadow-lg dark:shadow-black/40 rounded-xl p-6 md:p-8"
+    >
+      <h1 class="text-2xl font-bold text-center mb-8 text-emerald-700 dark:text-emerald-400">Add Unlisted Place</h1>
       <form @submit.prevent="submitPlace" class="space-y-5">
 
         <input required  v-model="place.name" placeholder="Place Name" class="input" />
@@ -17,9 +19,9 @@
           <input required  v-model="place.longitude" placeholder="Longitude" class="input flex-1 min-w-0" />
         </div>
         <input ref="fileInput" type="file" @change="handleImageUpload" class="input-file" accept="image/*"/>
-        <div v-if="imageFile" class="text-sm mt-2 flex items-center gap-3">
+        <div v-if="imageFile" class="text-sm mt-2 flex items-center gap-3 text-slate-700 dark:text-slate-300">
         <span>{{ imageFile.name }} ({{ Math.round(imageFile.size/1024) }} KB)</span>
-        <button type="button" @click="clearImage" class="text-red-600 underline">Remove</button>
+        <button type="button" @click="clearImage" class="text-red-600 dark:text-red-400 underline">Remove</button>
       </div>
         <textarea v-model="place.notes" placeholder="Optional Notes" rows="2" class="input"></textarea>
         <div class="flex justify-end gap-3 pt-4">
@@ -31,20 +33,24 @@
 
     <div class="w-full md:max-w-3xl mt-10">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-emerald-700">Unlisted Places</h2>
-        <button v-if="places.length" @click="deleteAllPlaces" class="text-red-600 hover:underline text-sm">
+        <h2 class="text-lg font-semibold text-emerald-700 dark:text-emerald-400">Unlisted Places</h2>
+        <button
+          v-if="places.length"
+          @click="deleteAllPlaces"
+          class="text-red-600 dark:text-red-400 hover:underline text-sm"
+        >
           Clear All
         </button>
       </div>
 
-      <p v-if="!places.length" class="text-center text-gray-500">No saved places yet</p>
+      <p v-if="!places.length" class="text-center text-gray-500 dark:text-slate-400">No saved places yet</p>
       <ul v-else class="space-y-4">
         <li v-for="p in limitedPlaces" :key="p.id" class="place-card">
 
           <div>
-            <h3 class="font-semibold">{{ p.name }}</h3>
-            <p class="text-sm text-gray-500">{{ p.description }}</p>
-            <p class="text-xs text-gray-400 mt-1">{{ p.latitude }}, {{ p.longitude }}</p>
+            <h3 class="font-semibold text-slate-900 dark:text-slate-100">{{ p.name }}</h3>
+            <p class="text-sm text-gray-500 dark:text-slate-400">{{ p.description }}</p>
+            <p class="text-xs text-gray-400 dark:text-slate-500 mt-1">{{ p.latitude }}, {{ p.longitude }}</p>
             
           </div>
           <div class="flex flex-col gap-2 shrink-0">
@@ -56,7 +62,7 @@
       <div v-if="places.length > displayLimit" class="text-center mt-4">
   <button
     @click="displayLimit += 3"
-    class="text-emerald-700 font-medium underline hover:text-emerald-900"
+    class="text-emerald-700 dark:text-emerald-400 font-medium underline hover:text-emerald-900 dark:hover:text-emerald-300"
   >
     Load more
   </button>
@@ -219,25 +225,25 @@ onMounted(() => {
 
 <style scoped>
 .input {
-  @apply w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none;
+  @apply w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900/80 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 px-4 py-2 rounded-lg focus:ring-2 focus:ring-emerald-600 dark:focus:ring-emerald-500 focus:outline-none;
 }
 .input-file {
-  @apply block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100;
+  @apply block w-full text-sm text-gray-700 dark:text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 dark:file:bg-emerald-900/45 file:text-emerald-700 dark:file:text-emerald-300 hover:file:bg-emerald-100 dark:hover:file:bg-emerald-800/55;
 }
 .btn-cancel {
-  @apply px-5 py-2 rounded-lg border border-gray-400 text-gray-600 hover:bg-gray-100 transition;
+  @apply px-5 py-2 rounded-lg border border-gray-400 dark:border-slate-500 text-gray-600 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition;
 }
 .btn-submit {
-  @apply px-5 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition;
+  @apply px-5 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 dark:hover:bg-emerald-500 transition;
 }
 .btn-view {
-  @apply px-3 py-1 text-sm rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100;
+  @apply px-3 py-1 text-sm rounded-lg bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-800/45;
 }
 .btn-delete {
-  @apply px-3 py-1 text-sm rounded-lg bg-red-50 text-red-600 hover:bg-red-100;
+  @apply px-3 py-1 text-sm rounded-lg bg-red-50 dark:bg-red-950/45 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/35;
 }
 .place-card {
-  @apply border border-gray-200 rounded-lg p-4 flex justify-between items-start;
+  @apply border border-gray-200 dark:border-slate-600 rounded-lg p-4 flex justify-between items-start gap-3 bg-white/40 dark:bg-slate-900/50;
 }
 
 

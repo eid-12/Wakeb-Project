@@ -37,7 +37,7 @@ export default {
 .geo-modal-content {
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  @apply bg-white dark:bg-slate-800 border border-black/[0.06] dark:border-slate-600/60;
   width: 100%;
   max-width: 420px;
   padding: 1.5rem 1.35rem;
@@ -45,7 +45,6 @@ export default {
   box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.06),
     0 20px 40px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .geo-modal-title {
@@ -59,7 +58,7 @@ export default {
 
 .geo-modal-message {
   font-size: 0.875rem;
-  color: #475569;
+  @apply text-slate-600 dark:text-slate-300;
   margin: 0 0 1.25rem;
   line-height: 1.55;
 }

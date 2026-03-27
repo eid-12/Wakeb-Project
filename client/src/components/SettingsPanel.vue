@@ -3,7 +3,7 @@
     Settings
   </h1>
 
-  <section class="p-4 sm:p-6 space-y-8">
+  <section class="p-4 sm:p-6 space-y-8 text-slate-900 dark:text-slate-100">
     <div class="grid md:grid-cols-2 gap-6 md:gap-8 px-0 sm:px-4 md:px-10">
       <div>
         <h2 class="font-semibold mb-3">General</h2>

@@ -1,85 +1,105 @@
 <template>
-  <div class="admin-panel p-6 space-y-6">
-    <h1 class="text-2xl font-bold mb-4 text-emerald-700">Admin Dashboard</h1>
+  <div class="admin-panel p-4 sm:p-6 space-y-6 w-full max-w-6xl mx-auto text-slate-800 dark:text-slate-100">
+    <h1 class="text-2xl font-bold mb-4 text-emerald-700 dark:text-emerald-400">Admin Dashboard</h1>
 
     <!-- Stats -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-      <div class="bg-gray-100 p-4 rounded">👥 Total Users: {{ totalElements  }}</div>
-      <div class="bg-green-100 p-4 rounded">🟢 Active Users: {{activeUserCount }}   </div>
-      <div class="bg-blue-100 p-4 rounded">🛡️ Admins: {{ activeAdminCount}}</div>
+      <div
+        class="bg-gray-100 dark:bg-slate-800 dark:border dark:border-slate-600/80 text-slate-800 dark:text-slate-200 p-4 rounded-lg"
+      >
+        👥 Total Users: {{ totalElements }}
+      </div>
+      <div
+        class="bg-green-100 dark:bg-emerald-950/50 dark:border dark:border-emerald-800/50 text-green-900 dark:text-emerald-200 p-4 rounded-lg"
+      >
+        🟢 Active Users: {{ activeUserCount }}
+      </div>
+      <div
+        class="bg-blue-100 dark:bg-slate-800 dark:border dark:border-blue-900/40 text-blue-900 dark:text-blue-200 p-4 rounded-lg"
+      >
+        🛡️ Admins: {{ activeAdminCount }}
+      </div>
     </div>
 
     <!-- Users Table -->
     <div class="admin-table-wrap overflow-x-auto -mx-2 px-2">
-    <table class="w-full mt-6 border text-center min-w-[640px]">
-      <thead>
-        <tr class="bg-gray-200">
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user1 in users" :key="user1.id">
-          <td>{{ user1.name }}</td>
-          <td>{{ user1.email }}</td>
-          <td>{{ user1.isUser ? 'User' : 'Admin' }}</td>
-          <td>{{ user1.active ? 'Active' : 'Inactive' }}</td>
-<td class="px-6 py-4 text-center space-x-2">
-  <button v-show="user1.active "
-    @click="toggleRole(user1)"
-    class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full text-sm font-medium transition"
-  >
-    <i class="fas fa-user-shield"></i> Toggle
-  </button>
+      <table
+        class="w-full mt-6 border border-gray-200 dark:border-slate-600 text-center min-w-[640px] text-sm"
+      >
+        <thead>
+          <tr class="bg-gray-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100">
+            <th class="px-2 py-2">Name</th>
+            <th class="px-2 py-2">Email</th>
+            <th class="px-2 py-2">Role</th>
+            <th class="px-2 py-2">Status</th>
+            <th class="px-2 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="user1 in users"
+            :key="user1.id"
+            class="border-b border-gray-100 dark:border-slate-700 odd:bg-transparent even:bg-slate-50/80 dark:even:bg-slate-800/40"
+          >
+            <td class="px-2 py-3 text-slate-800 dark:text-slate-200">{{ user1.name }}</td>
+            <td class="px-2 py-3 text-slate-700 dark:text-slate-300">{{ user1.email }}</td>
+            <td class="px-2 py-3">{{ user1.isUser ? 'User' : 'Admin' }}</td>
+            <td class="px-2 py-3">{{ user1.active ? 'Active' : 'Inactive' }}</td>
+            <td class="px-4 py-3 text-center space-x-2">
+              <button
+                v-show="user1.active"
+                type="button"
+                @click="toggleRole(user1)"
+                class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 rounded-full text-sm font-medium transition"
+              >
+                <i class="fas fa-user-shield"></i> Toggle
+              </button>
 
-  <button v-show="user1.active "
-    @click="resetPassword(user1)"
-    class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 rounded-full text-sm font-medium transition"
-  >
-    <i class="fas fa-key"></i> Reset
-  </button>
+              <button
+                v-show="user1.active"
+                type="button"
+                @click="resetPassword(user1)"
+                class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-amber-950/50 text-yellow-800 dark:text-amber-200 hover:bg-yellow-200 dark:hover:bg-amber-900/45 rounded-full text-sm font-medium transition"
+              >
+                <i class="fas fa-key"></i> Reset
+              </button>
 
-  <button
-    @click="deleteUsers(user1.id)"
-    v-show="user1.active && user1.id !== user?.id"
-    class="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-full text-sm font-medium transition"
-  >
-    <i class="fas fa-trash-alt"></i> Delete
-  </button>
-</td>
-
-        </tr>
-      </tbody>
-    </table>
+              <button
+                type="button"
+                @click="deleteUsers(user1.id)"
+                v-show="user1.active && user1.id !== user?.id"
+                class="inline-flex items-center gap-1 px-3 py-1 bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/45 rounded-full text-sm font-medium transition"
+              >
+                <i class="fas fa-trash-alt"></i> Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- Pagination -->
-<div class="flex justify-center items-center gap-4 mt-6">
-  <button
-    @click="prevPage"
+    <div class="flex justify-center items-center gap-4 mt-6 flex-wrap">
+      <button
+        type="button"
+        @click="prevPage"
+        :disabled="page <= 0"
+        class="px-4 py-2 rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition min-h-[44px]"
+      >
+        ⬅️ Prev
+      </button>
 
-    :disabled="page <= 0"
-    class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
-  >
-    ⬅️ Prev
-  </button>
+      <span class="text-sm text-gray-600 dark:text-slate-400 font-medium"> Page {{ page + 1 }} </span>
 
-  <span class="text-sm text-gray-600 font-medium">
-    Page {{ page + 1 }}
-  </span>
-
-  <button
-    @click="nextPage"
-    :disabled="!hasNextPage"
-    class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
-  >
-    Next ➡️
-  </button>
-</div>
-
+      <button
+        type="button"
+        @click="nextPage"
+        :disabled="!hasNextPage"
+        class="px-4 py-2 rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition min-h-[44px]"
+      >
+        Next ➡️
+      </button>
+    </div>
   </div>
 </template>
 

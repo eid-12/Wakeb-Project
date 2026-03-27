@@ -40,9 +40,16 @@ public class User implements UserDetails, Serializable {
     @Column(name = "email", nullable = false, length = 255)
     private String email;
 
-    /** Stored hash; schema uses {@code password_hash} (Hibernate default column name would be {@code password}). */
+    /** Bcrypt (or other) hash stored in {@code password_hash}. */
     @Column(name = "password_hash", nullable = false, length = 255)
     private String password;
+
+    /**
+     * Same table also has NOT NULL {@code password} (legacy / dual column). Must match {@link #password}
+     * — not a second encoding.
+     */
+    @Column(name = "password", nullable = false, length = 255)
+    private String passwordSchemaMirror;
 
     @Column(nullable = false, columnDefinition = "boolean default true")
     private Boolean isUser = true;
@@ -85,6 +92,18 @@ public class User implements UserDetails, Serializable {
         }
         if (name == null || name.isBlank()) {
             name = username != null && !username.isBlank() ? username : "User";
+        }
+        syncPasswordSchemaMirror();
+    }
+
+    @PreUpdate
+    void beforeUpdate() {
+        syncPasswordSchemaMirror();
+    }
+
+    private void syncPasswordSchemaMirror() {
+        if (password != null) {
+            passwordSchemaMirror = password;
         }
     }
 

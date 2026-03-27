@@ -40,7 +40,8 @@ public class User implements UserDetails, Serializable {
     @Column(name = "email", nullable = false, length = 255)
     private String email;
 
-    @Column(nullable = false, length = 60)
+    /** Stored hash; schema uses {@code password_hash} (Hibernate default column name would be {@code password}). */
+    @Column(name = "password_hash", nullable = false, length = 255)
     private String password;
 
     @Column(nullable = false, columnDefinition = "boolean default true")

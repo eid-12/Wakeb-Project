@@ -148,7 +148,6 @@ public class AuthController {
         String m = raw.toLowerCase();
         if (m.contains("could not execute")
                 || m.contains("field '")
-                || m.contains("email_verified")
                 || m.contains("doesn't have a default value")) {
             return "We could not save your account (server data configuration). Please try again later or contact support.";
         }
@@ -192,8 +191,7 @@ public class AuthController {
                 || m.contains("hibernate")
                 || m.contains("constraint")
                 || m.contains("duplicate entry")
-                || (m.contains("field '") && m.contains("default"))
-                || m.contains("email_verified");
+                || (m.contains("field '") && m.contains("default"));
     }
 
     // Change password by user

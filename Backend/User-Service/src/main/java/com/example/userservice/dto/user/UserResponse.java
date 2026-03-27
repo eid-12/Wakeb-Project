@@ -11,4 +11,5 @@ public record UserResponse(
         boolean locationTracking,
         @JsonProperty("isUser") Boolean isUser,
         String email,
+        String phone,
         Boolean active) {}

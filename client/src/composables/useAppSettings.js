@@ -3,7 +3,6 @@ import { reactive, watch } from 'vue';
 const STORAGE_KEY = 'wakeb.settings.v1';
 
 const defaults = {
-  language: 'English',
   theme: 'Light',
   savedPlacesNotifications: false,
   locationTracking: true,
@@ -15,7 +14,11 @@ const defaults = {
 function readStored() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return { ...defaults, ...(raw ? JSON.parse(raw) : {}) };
+    const parsed = raw ? JSON.parse(raw) : {};
+    if (parsed && typeof parsed === 'object') {
+      delete parsed.language;
+    }
+    return { ...defaults, ...parsed };
   } catch {
     return { ...defaults };
   }
@@ -33,34 +36,29 @@ export function hydrateUiFromStorage() {
   const root = document.documentElement;
   root.classList.toggle('dark', s.theme === 'Dark');
   root.style.fontSize = s.fontSize === 'Small' ? '14px' : '16px';
-  const loc = s.language === 'Arabic' ? 'ar' : 'en';
-  root.setAttribute('lang', loc);
-  root.setAttribute('dir', loc === 'ar' ? 'rtl' : 'ltr');
+  root.setAttribute('lang', 'en');
+  root.setAttribute('dir', 'ltr');
 }
 
-function applyFromReactive(i18n) {
+function applyFromReactive() {
   const root = document.documentElement;
   root.classList.toggle('dark', appSettings.theme === 'Dark');
   root.style.fontSize = appSettings.fontSize === 'Small' ? '14px' : '16px';
-  const loc = appSettings.language === 'Arabic' ? 'ar' : 'en';
-  root.setAttribute('lang', loc);
-  root.setAttribute('dir', loc === 'ar' ? 'rtl' : 'ltr');
-  if (i18n?.global?.locale) {
-    i18n.global.locale.value = loc;
-  }
+  root.setAttribute('lang', 'en');
+  root.setAttribute('dir', 'ltr');
   persistAppSettings();
 }
 
 let started = false;
 
-export function initAppSettings(i18n) {
+export function initAppSettings() {
   if (started) return;
   started = true;
-  applyFromReactive(i18n);
+  applyFromReactive();
   watch(
     appSettings,
     () => {
-      applyFromReactive(i18n);
+      applyFromReactive();
     },
     { deep: true }
   );

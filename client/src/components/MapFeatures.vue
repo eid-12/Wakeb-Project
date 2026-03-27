@@ -1,5 +1,5 @@
 <template>
-  <div class="search-container">
+  <div class="search-container wakeb-map-features">
     <!-- Search Section -->
     <div class="search-box">
       <input
@@ -202,43 +202,74 @@ defineExpose({
   position: absolute;
   z-index: 2;
   display: flex;
-  gap: 1rem;
-  padding: 2rem 1.5rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.65rem 0.5rem;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   top: 0;
   left: 0;
 }
 
+@media (min-width: 480px) {
+  .search-container {
+    gap: 0.75rem;
+    padding: 0.85rem 0.75rem;
+  }
+}
+
 @media (min-width: 768px) {
   .search-container {
+    flex-wrap: nowrap;
     width: auto;
     top: 40px;
     left: 60px;
     padding: 0;
+    gap: 1rem;
   }
 }
 
 .search-box {
   position: relative;
-  flex: 1;
-  min-width: 100%;
+  flex: 1 1 160px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
+  .search-box {
+    min-width: 280px;
+    max-width: 420px;
+  }
+}
+
+@media (min-width: 900px) {
   .search-box {
     min-width: 350px;
   }
 }
 
 .search-input {
-  padding: 0.75rem 1rem 0.75rem 2.25rem;
-  font-size: 0.875rem;
+  padding: 0.65rem 0.85rem 0.65rem 2.1rem;
+  font-size: 1rem;
   width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
   border-radius: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.08);
   outline: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+@media (min-width: 768px) {
+  .search-input {
+    padding: 0.75rem 1rem 0.75rem 2.25rem;
+    font-size: 0.875rem;
+    min-height: 0;
+  }
 }
 
 .search-input:focus {
@@ -333,14 +364,23 @@ defineExpose({
 }
 
 .geolocation-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.85rem;
   background: white;
   display: flex;
   align-items: center;
-  min-height: 45px;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .geolocation-btn {
+    margin-left: auto;
+  }
 }
 
 .geo-active {

@@ -36,3 +36,89 @@ html.dark .page-container .login-panel {
 html.dark .page-container .status-message {
   color: #6ee7b7;
 }
+
+/* Leaflet: layer picker + attribution in dark mode */
+html.dark #custom-layer-control .leaflet-control-layers {
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+html.dark #custom-layer-control .leaflet-control-layers-separator {
+  border-top-color: rgba(148, 163, 184, 0.25);
+}
+
+html.dark #custom-layer-control .leaflet-control-layers-toggle {
+  background-color: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+html.dark .leaflet-container .leaflet-control-attribution {
+  background: rgba(15, 23, 42, 0.82);
+  color: #94a3b8;
+  font-size: 0.65rem;
+  max-width: calc(100% - 12px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.dark .leaflet-container .leaflet-control-attribution a {
+  color: #7dd3fc;
+}
+
+/* Map search bar (MapFeatures) */
+html.dark .wakeb-map-features .search-input {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.35);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+html.dark .wakeb-map-features .search-input::placeholder {
+  color: #94a3b8;
+}
+
+html.dark .wakeb-map-features .search-input:focus {
+  border-color: #2dd4bf;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.25);
+}
+
+html.dark .wakeb-map-features .search-icon {
+  color: #94a3b8;
+}
+
+html.dark .wakeb-map-features .search-results {
+  background: #1e293b;
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+html.dark .wakeb-map-features .result-item:hover {
+  background-color: #0f172a;
+  color: #5eead4;
+}
+
+html.dark .wakeb-map-features .result-text {
+  color: #e2e8f0;
+}
+
+html.dark .wakeb-map-features .selected-result {
+  background: #1e293b;
+  border-color: rgba(148, 163, 184, 0.25);
+  color: #e2e8f0;
+}
+
+html.dark .wakeb-map-features .selected-title {
+  color: #f1f5f9;
+}
+
+html.dark .wakeb-map-features .geolocation-btn {
+  background: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+html.dark .wakeb-map-features .geo-icon {
+  color: #5eead4;
+}

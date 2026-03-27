@@ -24,22 +24,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByEmail(String email);
 
     // Custom query to return a projection of the user including selected fields
-    @Query("""
-       SELECT new com.example.userservice.dto.user.UserResponse(
-              u.id,
-              u.name,
-              s.language,
-              s.theme,
-              s.fontSize,
-              COALESCE(s.locationTracking, false),
-              u.isUser,
-              u.email,
-              u.active
-       )
-       FROM User u
-       LEFT JOIN u.settings s
-       WHERE u.id = :id
-    """)
+    @Query(
+            "SELECT new com.example.userservice.dto.user.UserResponse("
+                    + "u.id, u.name, s.language, s.theme, s.fontSize, COALESCE(s.locationTracking, false), "
+                    + "u.isUser, u.email, u.phone, u.active) "
+                    + "FROM User u LEFT JOIN u.settings s WHERE u.id = :id")
     Optional<UserResponse> findProjectedById(@Param("id") Integer id);
 
     // Count all active users

@@ -4,10 +4,10 @@
   <!-- Navbar -->  
     <nav class="navbar" aria-label="Main">
       <div class="navbar-left">
-        <h1 class="logo">{{ t('app.title') }}</h1>
+        <h1 class="logo">Wakeb Maps</h1>
       </div>
       <div class="navbar-right">
-        <span v-if="showNavbarSuccess" class="status-message">{{ t('nav.success') }}</span>
+        <span v-if="showNavbarSuccess" class="status-message">Success! ✓</span>
           
           <button v-if="isLoggedIn" type="button" class="user-flag" @click="selectedMenu = 'settings'">
           <i class="fa-solid fa-user" aria-hidden="true"></i>
@@ -15,10 +15,10 @@
           </button>
 
         <button id="Logout" v-if="isLoggedIn" type="button" class="logout-button" @click="logout">
-          <i class="fas fa-sign-out-alt" aria-hidden="true"></i> {{ t('nav.logout') }}
+          <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
         </button>
         <button v-else type="button" class="logout-button" @click="showLogin = true">
-          <i class="fas fa-user" aria-hidden="true"></i> {{ t('nav.login') }}
+          <i class="fas fa-user" aria-hidden="true"></i> Login
         </button>
       </div>
     </nav>
@@ -40,16 +40,16 @@
       <!-- Sidebar (only when logged in) -->
       <div v-if="isLoggedIn" class="side-dashboard">
         <ul class="dashboard-menu">
-          <li :class="{ active: selectedMenu === 'map' }" @click="selectedMenu = 'map'">{{ t('menu.map') }}</li>
+          <li :class="{ active: selectedMenu === 'map' }" @click="selectedMenu = 'map'">Map</li>
 
-          <li :class="{ active: selectedMenu === 'saved' }" @click="selectedMenu = 'saved'">{{ t('menu.saved') }}</li>
+          <li :class="{ active: selectedMenu === 'saved' }" @click="selectedMenu = 'saved'">Saved Places</li>
 
-          <li :class="{ active: selectedMenu === 'history' }" @click="selectedMenu = 'history'">{{ t('menu.history') }}</li>
+          <li :class="{ active: selectedMenu === 'history' }" @click="selectedMenu = 'history'">Search History</li>
 
-          <li :class="{ active: selectedMenu === 'add' }" @click="selectedMenu = 'add'">{{ t('menu.add') }}</li>
+          <li :class="{ active: selectedMenu === 'add' }" @click="selectedMenu = 'add'">Add Unlisted Place</li>
 
-          <li :class="{ active: selectedMenu === 'settings' }" @click="selectedMenu = 'settings'">{{ t('menu.settings') }}</li>
-          <li v-show="isProfileAdmin(user)" :class="{ active: selectedMenu === 'admin' }" @click="selectedMenu = 'admin'">{{ t('menu.admin') }}</li>          
+          <li :class="{ active: selectedMenu === 'settings' }" @click="selectedMenu = 'settings'">Settings</li>
+          <li v-show="isProfileAdmin(user)" :class="{ active: selectedMenu === 'admin' }" @click="selectedMenu = 'admin'">Administration</li>          
         </ul>
       </div>
 
@@ -113,7 +113,6 @@
  * Imports
  *************************/
 import { ref, onMounted, watch, nextTick } from 'vue';
-import { useI18n } from 'vue-i18n';
 import leaflet from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
@@ -147,7 +146,6 @@ const savedPlaces = ref(JSON.parse(localStorage.getItem('savedPlaces') || '[]'))
 const latestQuery = ref("");
 const showWelcome = ref(true)
 /* Titles could still be useful somewhere else */
-const { t } = useI18n();
 const { user, setUser, clearUser } = useUser();
 const { showAlert } = useAlerts();
 
@@ -184,9 +182,38 @@ const searchResults  = ref(null);
 const selectedPlace = ref(null);
 let dest  = "";
 
-let map;         
+let map;
 let mapInitialized = false;
 let placeName = [];
+
+/** Tile layers + map for theme sync (CartoDB Dark when app dark mode) */
+let tileRefs = null;
+let layersControlInstance = null;
+
+function mountLayersControl() {
+  if (!map || !tileRefs) return;
+  if (layersControlInstance) {
+    map.removeControl(layersControlInstance);
+    layersControlInstance = null;
+  }
+  layersControlInstance = leaflet.control.layers(tileRefs.layerMap).addTo(map);
+  nextTick(() => {
+    const ctl = map.getContainer()?.querySelector('.leaflet-control-layers');
+    const dest = document.getElementById('custom-layer-control');
+    if (ctl && dest && !dest.contains(ctl)) dest.appendChild(ctl);
+  });
+}
+
+function syncBaseLayerToTheme() {
+  if (!map || !tileRefs) return;
+  const { layerMap, cartoDark, openStreetMap } = tileRefs;
+  Object.values(layerMap).forEach((layer) => {
+    if (map.hasLayer(layer)) map.removeLayer(layer);
+  });
+  const next = appSettings.theme === 'Dark' ? cartoDark : openStreetMap;
+  next.addTo(map);
+  mountLayersControl();
+}
 
 /*************************
  * Helper functions
@@ -195,8 +222,8 @@ function getGeolocation() {
   if (!appSettings.locationTracking) {
     showAlert({
       type: 'info',
-      title: t('settings.privacy'),
-      message: t('geo.enableInSettings'),
+      title: 'Privacy & Location',
+      message: 'Turn on “Enable Location Tracking” in Settings to use this feature.',
     });
     return;
   }
@@ -387,6 +414,14 @@ watch(isLoggedIn, (v) => {
   if (v) maybeAutoClearSearchHistory();
 });
 
+watch(
+  () => appSettings.theme,
+  () => {
+    syncBaseLayerToTheme();
+    nextTick(() => map?.invalidateSize());
+  }
+);
+
 function flyTo (place) {
   selectedMenu.value = 'map';
 
@@ -497,15 +532,11 @@ onMounted(async () => {
     );
   }
 
-  openStreetMap.addTo(map); // default
-
-  leaflet.control.layers(layerMap).addTo(map);
+  tileRefs = { layerMap, openStreetMap, cartoDark };
+  syncBaseLayerToTheme();
 
   map.whenReady(() => {
     removeRoute();
-    const ctl  = document.querySelector('.leaflet-control-layers');
-    const dest = document.getElementById('custom-layer-control');
-    if (ctl && dest) dest.appendChild(ctl);
   });
 let lat, lng;
 map.on('click', async (e) => {
@@ -590,6 +621,7 @@ btn.addEventListener('click', (evt) => {
   flex-direction: column;
   position: relative;
   user-select: none;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .navbar {
@@ -599,7 +631,8 @@ btn.addEventListener('click', (evt) => {
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: calc(0.65rem + env(safe-area-inset-top, 0px)) max(0.75rem, env(safe-area-inset-right, 0px))
+    calc(0.55rem + env(safe-area-inset-bottom, 0px) * 0.25) max(0.75rem, env(safe-area-inset-left, 0px));
   flex-shrink: 0;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
 }
@@ -749,9 +782,30 @@ btn.addEventListener('click', (evt) => {
 
 .custom-layer-control {
   position: absolute;
-  bottom: 24px;
-  right: 12px;
+  bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  right: max(8px, env(safe-area-inset-right, 0px));
   z-index: 1000;
+  max-width: min(300px, calc(100vw - 16px));
+  pointer-events: auto;
+}
+
+.custom-layer-control :deep(.leaflet-control-layers) {
+  border-radius: 10px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+  font-size: 0.8125rem;
+  margin: 0;
+}
+
+.custom-layer-control :deep(.leaflet-control-layers-expanded) {
+  max-height: min(320px, 42vh);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.custom-layer-control :deep(.leaflet-control-layers-toggle) {
+  width: 38px;
+  height: 38px;
+  background-size: 22px 22px;
 }
 
 @media (min-width: 768px) {
@@ -762,8 +816,14 @@ btn.addEventListener('click', (evt) => {
   }
 
   .custom-layer-control {
-    bottom: 30px;
-    right: 24px;
+    bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    right: max(16px, env(safe-area-inset-right, 0px));
+    max-width: 320px;
+  }
+
+  .custom-layer-control :deep(.leaflet-control-layers-expanded) {
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
@@ -829,12 +889,16 @@ btn.addEventListener('click', (evt) => {
 @media (max-width: 767px) {
   .content-container {
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
   }
 
   .side-dashboard {
     width: 100%;
     order: 1;
-    padding: 0.5rem 0.35rem;
+    padding: 0.5rem max(0.35rem, env(safe-area-inset-left, 0px)) 0.5rem
+      max(0.35rem, env(safe-area-inset-right, 0px));
+    flex-shrink: 0;
   }
 
   .dashboard-menu {
@@ -845,20 +909,30 @@ btn.addEventListener('click', (evt) => {
     -webkit-overflow-scrolling: touch;
     padding-bottom: 0.25rem;
     scrollbar-width: thin;
+    overscroll-behavior-x: contain;
   }
 
   .dashboard-menu li {
     flex: 0 0 auto;
     margin-bottom: 0;
     white-space: nowrap;
-    padding: 0.55rem 0.75rem;
+    padding: 0.6rem 0.85rem;
     font-size: 0.8125rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 
   .map-and-overlay {
     order: 2;
     flex: 1;
-    min-height: 280px;
+    min-height: clamp(260px, 46dvh, 560px);
+    min-width: 0;
+  }
+
+  .logout-button {
+    min-height: 44px;
+    padding: 0.4rem 0.65rem;
   }
 
   .content-container.with-login .login-panel {
@@ -867,6 +941,8 @@ btn.addEventListener('click', (evt) => {
     width: 100%;
     height: 100%;
     z-index: 650;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
+      env(safe-area-inset-left, 0px);
   }
 }
 

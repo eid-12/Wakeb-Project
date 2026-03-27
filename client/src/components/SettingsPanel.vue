@@ -1,80 +1,79 @@
 <template>
   <h1 class="py-10 text-3xl font-bold text-center text-emerald-700 dark:text-emerald-400">
-    {{ t('settings.title') }}
+    Settings
   </h1>
 
   <section class="p-4 sm:p-6 space-y-8">
     <div class="grid md:grid-cols-2 gap-6 md:gap-8 px-0 sm:px-4 md:px-10">
-
       <div>
-        <h2 class="font-semibold mb-3">{{ t('settings.general') }}</h2>
+        <h2 class="font-semibold mb-3">General</h2>
 
-        <label class="block mb-1">{{ t('settings.language') }}</label>
-        <select v-model="appSettings.language" class="border rounded px-2 py-1 w-full mb-4 dark:bg-gray-800 dark:border-gray-600">
-          <option value="English">{{ t('settings.langEnglish') }}</option>
-          <option value="Arabic">{{ t('settings.langArabic') }}</option>
-        </select>
-
-        <label class="block mb-1">{{ t('settings.theme') }}</label>
-        <div class="space-x-4 rtl:space-x-reverse">
-          <label><input type="radio" value="Light" v-model="appSettings.theme" /> {{ t('settings.themeLight') }}</label>
-          <label><input type="radio" value="Dark" v-model="appSettings.theme" /> {{ t('settings.themeDark') }}</label>
+        <label class="block mb-1">Theme</label>
+        <div class="space-x-4">
+          <label><input type="radio" value="Light" v-model="appSettings.theme" /> Light</label>
+          <label><input type="radio" value="Dark" v-model="appSettings.theme" /> Dark</label>
         </div>
       </div>
 
       <div>
-        <h2 class="font-semibold mb-3">{{ t('settings.account') }}</h2>
+        <h2 class="font-semibold mb-3">Account</h2>
+        <button type="button" class="btn-setting" @click="openEmailModal">
+          <i class="fas fa-envelope"></i> Change email
+        </button>
+        <button type="button" class="btn-setting" @click="openPhoneModal">
+          <i class="fas fa-mobile-screen"></i> Mobile number
+        </button>
         <button type="button" class="btn-setting" @click="showPasswordModal = true">
-          <i class="fas fa-key"></i> {{ t('settings.changePassword') }}
+          <i class="fas fa-key"></i> Change Password
         </button>
         <button type="button" class="btn-setting" @click="showUsernameModal = true">
-          <i class="fa-solid fa-user-pen"></i> {{ t('settings.changeUsername') }}
+          <i class="fa-solid fa-user-pen"></i> Change Username
         </button>
         <button type="button" class="btn-setting-danger" :disabled="deleting" @click="deleteAccount">
-          <i class="fas fa-trash-alt"></i> {{ deleting ? t('settings.deleting') : t('settings.deleteAccount') }}
+          <i class="fas fa-trash-alt"></i> {{ deleting ? 'Deleting…' : 'Delete Account' }}
         </button>
       </div>
 
       <div>
-        <h2 class="font-semibold mb-3">{{ t('settings.notifications') }}</h2>
+        <h2 class="font-semibold mb-3">Notifications</h2>
         <label class="block">
           <input type="checkbox" v-model="appSettings.savedPlacesNotifications" />
-          {{ t('settings.savedPlacesNotif') }}
+          Saved Places Notifications
         </label>
       </div>
 
       <div>
-        <h2 class="font-semibold mb-3">{{ t('settings.privacy') }}</h2>
+        <h2 class="font-semibold mb-3">Privacy &amp; Location</h2>
         <label class="block">
           <input
             type="checkbox"
             v-model="appSettings.locationTracking"
             @change="onLocationTrackingChange"
           />
-          {{ t('settings.locationTracking') }}
+          Enable Location Tracking
         </label>
         <button type="button" @click="manageSearchData" class="mt-2 border px-3 py-1 rounded w-full dark:border-gray-600 dark:hover:bg-gray-800">
-          {{ t('settings.manageSearchData') }}
+          Manage Search Data
         </button>
       </div>
 
       <div>
-        <h2 class="font-semibold mb-3">{{ t('settings.interface') }}</h2>
-        <label class="block mb-1">{{ t('settings.fontSize') }}</label>
-        <label><input type="radio" value="Small" v-model="appSettings.fontSize" /> {{ t('settings.fontSmall') }}</label>
-        <label class="ms-4 rtl:ms-0 rtl:me-4"><input type="radio" value="Medium" v-model="appSettings.fontSize" /> {{ t('settings.fontMedium') }}</label>
+        <h2 class="font-semibold mb-3">Interface</h2>
+        <label class="block mb-1">Font Size</label>
+        <label><input type="radio" value="Small" v-model="appSettings.fontSize" /> Small</label>
+        <label class="ms-4"><input type="radio" value="Medium" v-model="appSettings.fontSize" /> Medium</label>
       </div>
 
       <div>
-        <h2 class="font-semibold mb-3">{{ t('settings.dataSettings') }}</h2>
+        <h2 class="font-semibold mb-3">Data Settings</h2>
         <label class="block">
           <input type="checkbox" v-model="appSettings.autoDeleteHistory" />
-          {{ t('settings.autoDeleteHistory') }}
+          Automatically delete search history every week
         </label>
 
         <label class="block mt-2">
           <input type="checkbox" v-model="appSettings.exportFavorites" />
-          {{ t('settings.exportFavorites') }}
+          Export favorites to a CSV file
         </label>
         <button
           v-if="appSettings.exportFavorites"
@@ -83,7 +82,7 @@
           :disabled="exportingCsv"
           @click="exportFavoritesCsv"
         >
-          {{ exportingCsv ? '…' : t('settings.exportCsvNow') }}
+          {{ exportingCsv ? '…' : 'Download CSV now' }}
         </button>
       </div>
     </div>
@@ -91,13 +90,13 @@
 
   <div v-if="showPasswordModal" class="modal-overlay" @keydown.esc="closePasswordModal" tabindex="0">
     <div class="modal-card">
-      <h3 class="modal-heading text-xl font-semibold mb-4">{{ t('settings.pwdModalTitle') }}</h3>
+      <h3 class="modal-heading text-xl font-semibold mb-4">Change Password</h3>
 
       <div class="relative">
         <input
           v-model="passwordForm.current"
           :type="showPwd.current ? 'text' : 'password'"
-          :placeholder="t('settings.pwdCurrent')"
+          placeholder="Current password"
           class="input pr-10"
           autocomplete="current-password"
         />
@@ -115,7 +114,7 @@
         <input
           v-model="passwordForm.new"
           :type="showPwd.new ? 'text' : 'password'"
-          :placeholder="t('settings.pwdNew')"
+          placeholder="New password"
           class="input pr-10"
         />
         <button
@@ -132,7 +131,7 @@
         <input
           v-model="passwordForm.confirm"
           :type="showPwd.confirm ? 'text' : 'password'"
-          :placeholder="t('settings.pwdConfirm')"
+          placeholder="Confirm new password"
           class="input pr-10"
         />
         <button
@@ -146,9 +145,9 @@
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="btn-cancel" @click="closePasswordModal">{{ t('settings.cancel') }}</button>
+        <button type="button" class="btn-cancel" @click="closePasswordModal">Cancel</button>
         <button type="button" class="btn-primary" :disabled="passwordLoading" @click="submitPassword">
-          {{ passwordLoading ? t('settings.saving') : t('settings.save') }}
+          {{ passwordLoading ? 'Saving…' : 'Save' }}
         </button>
       </div>
     </div>
@@ -156,23 +155,76 @@
 
   <div v-if="showUsernameModal" class="modal-overlay" @click.self="closeUsernameModal" @keydown.esc="closeUsernameModal" tabindex="0">
     <div class="modal-card">
-      <h3 class="modal-heading text-xl font-semibold mb-4">{{ t('settings.usernameModalTitle') }}</h3>
+      <h3 class="modal-heading text-xl font-semibold mb-4">Change Username</h3>
 
-      <input v-model.trim="usernameForm.newUsername" type="text" :placeholder="t('settings.usernamePlaceholder')" class="input" />
+      <input v-model.trim="usernameForm.newUsername" type="text" placeholder="New username" class="input" />
 
       <p v-if="invalidUsername" class="text-red-500 text-sm mt-1">
-        {{ t('settings.usernameInvalid') }}
+        Only letters, numbers, dot and underscore (3–30 chars)
       </p>
 
       <div class="modal-actions mt-4">
-        <button type="button" class="btn-cancel" @click="closeUsernameModal">{{ t('settings.cancel') }}</button>
+        <button type="button" class="btn-cancel" @click="closeUsernameModal">Cancel</button>
         <button
           type="button"
           class="btn-primary"
           :disabled="savingUsername || invalidUsername || !usernameForm.newUsername.trim()"
           @click="submitUsername"
         >
-          {{ savingUsername ? t('settings.saving') : t('settings.save') }}
+          {{ savingUsername ? 'Saving…' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="showEmailModal" class="modal-overlay" @click.self="closeEmailModal" @keydown.esc="closeEmailModal" tabindex="0">
+    <div class="modal-card">
+      <h3 class="modal-heading text-xl font-semibold mb-4">Change email</h3>
+      <p v-if="user?.email" class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+        Current: {{ user.email }}
+      </p>
+      <input
+        v-if="user?.email"
+        v-model.trim="emailForm.oldEmail"
+        type="email"
+        autocomplete="email"
+        placeholder="Current email"
+        class="input"
+      />
+      <input
+        v-model.trim="emailForm.newEmail"
+        type="email"
+        autocomplete="email"
+        placeholder="New email"
+        class="input"
+      />
+
+      <div class="modal-actions mt-4">
+        <button type="button" class="btn-cancel" @click="closeEmailModal">Cancel</button>
+        <button type="button" class="btn-primary" :disabled="savingEmail" @click="submitEmail">
+          {{ savingEmail ? 'Saving…' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="showPhoneModal" class="modal-overlay" @click.self="closePhoneModal" @keydown.esc="closePhoneModal" tabindex="0">
+    <div class="modal-card">
+      <h3 class="modal-heading text-xl font-semibold mb-4">Mobile number</h3>
+      <input
+        v-model.trim="phoneForm.phone"
+        type="tel"
+        inputmode="tel"
+        maxlength="30"
+        placeholder="e.g. +966 5xx xxx xxx"
+        class="input"
+      />
+      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty and save to remove your number.</p>
+
+      <div class="modal-actions mt-4">
+        <button type="button" class="btn-cancel" @click="closePhoneModal">Cancel</button>
+        <button type="button" class="btn-primary" :disabled="savingPhone" @click="submitPhone">
+          {{ savingPhone ? 'Saving…' : 'Save' }}
         </button>
       </div>
     </div>
@@ -182,13 +234,14 @@
 <script setup>
 /* global defineEmits */
 import { reactive, ref, onMounted, computed, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
 import Swal from 'sweetalert2';
 
 import {
   getUser,
   changeUsername,
   changePassword,
+  changeEmail,
+  changePhone,
   deleteUser,
   clearSearchHistory,
   fetchSavedPlace,
@@ -197,7 +250,6 @@ import {
 import { appSettings } from '@/composables/useAppSettings';
 import { useAlerts } from '@/composables/useAlerts';
 
-const { t } = useI18n();
 const { showAlert, showConfirm } = useAlerts();
 const emit = defineEmits(['change-menu', 'logout']);
 
@@ -221,12 +273,20 @@ watch(
   async (enabled) => {
     if (!enabled) return;
     if (typeof Notification === 'undefined') {
-      showAlert({ type: 'warning', title: t('settings.notifications'), message: t('settings.notifNoBrowser') });
+      showAlert({
+        type: 'warning',
+        title: 'Notifications',
+        message: 'Notifications are not supported in this browser.',
+      });
       appSettings.savedPlacesNotifications = false;
       return;
     }
     if (Notification.permission === 'denied') {
-      showAlert({ type: 'warning', title: t('settings.notifications'), message: t('settings.notifDenied') });
+      showAlert({
+        type: 'warning',
+        title: 'Notifications',
+        message: 'Notifications were blocked. Enable them in the browser settings to use this option.',
+      });
       appSettings.savedPlacesNotifications = false;
       return;
     }
@@ -234,7 +294,11 @@ watch(
       const p = await Notification.requestPermission();
       if (p !== 'granted') {
         appSettings.savedPlacesNotifications = false;
-        showAlert({ type: 'warning', title: t('settings.notifications'), message: t('settings.notifDenied') });
+        showAlert({
+          type: 'warning',
+          title: 'Notifications',
+          message: 'Notifications were blocked. Enable them in the browser settings to use this option.',
+        });
       }
     }
   }
@@ -243,14 +307,22 @@ watch(
 function onLocationTrackingChange() {
   if (!appSettings.locationTracking) return;
   if (!navigator.geolocation) {
-    showAlert({ type: 'warning', title: t('settings.privacy'), message: t('settings.locationNoBrowser') });
+    showAlert({
+      type: 'warning',
+      title: 'Privacy & Location',
+      message: 'This browser does not support geolocation.',
+    });
     appSettings.locationTracking = false;
     return;
   }
   navigator.geolocation.getCurrentPosition(
     () => {},
     () => {
-      showAlert({ type: 'info', title: t('settings.privacy'), message: t('settings.locationDenied') });
+      showAlert({
+        type: 'info',
+        title: 'Privacy & Location',
+        message: 'Location permission was denied or unavailable.',
+      });
     },
     { timeout: 8000, maximumAge: 0 }
   );
@@ -320,7 +392,11 @@ async function submitUsername() {
     return;
   }
   if (invalidUsername.value) {
-    showAlert({ type: 'warning', title: 'Notice', message: t('settings.usernameInvalid') });
+    showAlert({
+      type: 'warning',
+      title: 'Notice',
+      message: 'Only letters, numbers, dot and underscore (3–30 chars)',
+    });
     return;
   }
   const confirm = await showConfirm({
@@ -343,21 +419,106 @@ async function submitUsername() {
   }
 }
 
+const showEmailModal = ref(false);
+const emailForm = reactive({ oldEmail: '', newEmail: '' });
+const savingEmail = ref(false);
+
+function openEmailModal() {
+  emailForm.oldEmail = '';
+  emailForm.newEmail = '';
+  showEmailModal.value = true;
+}
+
+function closeEmailModal() {
+  showEmailModal.value = false;
+  emailForm.oldEmail = '';
+  emailForm.newEmail = '';
+}
+
+async function submitEmail() {
+  const newE = emailForm.newEmail.trim();
+  if (!newE) {
+    showAlert({ type: 'warning', title: 'Notice', message: 'Please enter a new email address.' });
+    return;
+  }
+  if (user.value?.email) {
+    if (!emailForm.oldEmail.trim()) {
+      showAlert({ type: 'warning', title: 'Notice', message: 'Enter your current email to confirm.' });
+      return;
+    }
+  }
+  savingEmail.value = true;
+  try {
+    await changeEmail({
+      oldEmail: user.value?.email ? emailForm.oldEmail.trim() : null,
+      newEmail: newE,
+    });
+    const u = await getUser();
+    setUser(u);
+    showAlert({ type: 'success', title: 'Updated', message: 'Email updated successfully.' });
+    closeEmailModal();
+  } catch (e) {
+    const msg =
+      e.response?.data?.message ||
+      e.response?.data?.error ||
+      e.message ||
+      'Could not update email.';
+    showAlert({ type: 'danger', title: 'Error', message: msg });
+  } finally {
+    savingEmail.value = false;
+  }
+}
+
+const showPhoneModal = ref(false);
+const phoneForm = reactive({ phone: '' });
+const savingPhone = ref(false);
+
+function openPhoneModal() {
+  phoneForm.phone = user.value?.phone != null ? String(user.value.phone) : '';
+  showPhoneModal.value = true;
+}
+
+function closePhoneModal() {
+  showPhoneModal.value = false;
+  phoneForm.phone = '';
+}
+
+async function submitPhone() {
+  savingPhone.value = true;
+  try {
+    const trimmed = phoneForm.phone.trim();
+    await changePhone({ phone: trimmed === '' ? null : trimmed });
+    const u = await getUser();
+    setUser(u);
+    showAlert({ type: 'success', title: 'Updated', message: 'Mobile number saved.' });
+    closePhoneModal();
+  } catch (e) {
+    const msg =
+      e.response?.data?.message ||
+      e.response?.data?.error ||
+      e.message ||
+      'Could not save mobile number.';
+    showAlert({ type: 'danger', title: 'Error', message: msg });
+  } finally {
+    savingPhone.value = false;
+  }
+}
+
 const deleting = ref(false);
 
 async function deleteAccount() {
   const { value, isConfirmed } = await Swal.fire({
-    title: t('settings.deleteConfirmTitle'),
-    html: t('settings.deleteConfirmHtml'),
+    title: 'Delete account?',
+    html: 'This permanently deletes your account and cannot be undone. Type <strong>DELETE</strong> to confirm.',
     input: 'text',
-    inputPlaceholder: t('settings.deleteTypePlaceholder'),
+    inputPlaceholder: 'Type DELETE',
     showCancelButton: true,
-    confirmButtonText: t('settings.deleteAccount'),
-    cancelButtonText: t('settings.cancel'),
+    confirmButtonText: 'Delete Account',
+    cancelButtonText: 'Cancel',
     confirmButtonColor: '#dc2626',
     cancelButtonColor: '#6b7280',
     inputValidator: (v) => {
-      if (v !== 'DELETE') return t('settings.deleteMismatch');
+      if (v !== 'DELETE') return 'Please type DELETE exactly to confirm.';
       return null;
     },
   });
@@ -381,15 +542,19 @@ async function deleteAccount() {
 
 async function manageSearchData() {
   const ok = await showConfirm({
-    title: t('settings.manageSearchTitle'),
-    message: t('settings.manageSearchBody'),
-    confirmText: t('settings.clear'),
-    cancelText: t('settings.cancel'),
+    title: 'Clear search history?',
+    message: 'This removes all saved searches from the server for your account.',
+    confirmText: 'Clear history',
+    cancelText: 'Cancel',
   });
   if (!ok) return;
   try {
     await clearSearchHistory();
-    showAlert({ type: 'success', title: t('settings.manageSearchData'), message: t('settings.historyCleared') });
+    showAlert({
+      type: 'success',
+      title: 'Manage Search Data',
+      message: 'Search history was cleared.',
+    });
     emit('change-menu', 'history');
   } catch (e) {
     showAlert({
@@ -430,9 +595,9 @@ async function exportFavoritesCsv() {
     a.download = `wakeb-favorites-${Date.now()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    showAlert({ type: 'success', title: t('settings.dataSettings'), message: t('settings.exportDone') });
+    showAlert({ type: 'success', title: 'Data Settings', message: 'Favorites exported.' });
   } catch (e) {
-    showAlert({ type: 'danger', title: 'Error', message: t('settings.exportFailed') });
+    showAlert({ type: 'danger', title: 'Error', message: 'Could not export favorites.' });
   } finally {
     exportingCsv.value = false;
   }
@@ -448,7 +613,7 @@ async function exportFavoritesCsv() {
          transition-colors duration-150 ease-in-out;
 }
 .btn-setting i {
-  @apply mr-2 rtl:mr-0 rtl:ml-2;
+  @apply mr-2;
 }
 
 .btn-setting-danger {
@@ -482,7 +647,7 @@ async function exportFavoritesCsv() {
 }
 
 .eye-btn {
-  @apply absolute right-2 rtl:right-auto rtl:left-2 top-1/2 -translate-y-1/2
+  @apply absolute right-2 top-1/2 -translate-y-1/2
          h-8 w-8 grid place-items-center rounded
          text-gray-600 dark:text-gray-300
          hover:bg-black/5 dark:hover:bg-white/10;

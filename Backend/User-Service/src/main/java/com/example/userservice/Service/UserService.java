@@ -79,6 +79,7 @@ public class UserService {
                         user.getSettings().isLocationTracking(),
                         user.getIsUser(),
                         user.getEmail(),
+                        user.getPhone(),
                         user.getActive()
                 ));
     }
@@ -112,6 +113,13 @@ public class UserService {
             throw new IllegalArgumentException("Old e‑mail does not match our records");
 
         user.setEmail(req.newEmail());
+    }
+
+    public void updatePhone(Integer id, PhoneUpdateRequest req) {
+        User u = repo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        String p = req.phone() == null ? null : req.phone().trim();
+        u.setPhone(p == null || p.isEmpty() ? null : p);
     }
 
     // Change user's username after checking for duplicates

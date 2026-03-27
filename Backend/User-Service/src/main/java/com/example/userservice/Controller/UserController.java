@@ -4,6 +4,7 @@ import com.example.userservice.Model.User;
 import com.example.userservice.Repository.UserRepository;
 import com.example.userservice.Service.UserService;
 import com.example.userservice.dto.user.EmailUpdateRequest;
+import com.example.userservice.dto.user.PhoneUpdateRequest;
 import com.example.userservice.dto.user.UserCreateRequest;
 import com.example.userservice.dto.user.UserListWithStats;
 import com.example.userservice.dto.user.UserResponse;
@@ -82,5 +83,12 @@ public class UserController {
     public void changeEmail(@RequestHeader("X-User-Id") Integer userId,
                             @RequestBody @Valid EmailUpdateRequest body) {
         userService.changeEmail(userId, body);
+    }
+
+    @PatchMapping("/phone")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePhone(@RequestHeader("X-User-Id") Integer userId,
+                            @RequestBody @Valid PhoneUpdateRequest body) {
+        userService.updatePhone(userId, body);
     }
 }

@@ -26,6 +26,9 @@ public class User {
     @Column(nullable = true, unique = true, length = 100)
     private String email;
 
+    @Column(nullable = true, length = 30)
+    private String phone;
+
     // Account creation timestamp, default is current time
     @Builder.Default
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());

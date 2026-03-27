@@ -60,6 +60,9 @@ export const getUser = async () => {
 /** Backend EmailUpdateRequest: { oldEmail, newEmail } — oldEmail may be null if the account has no email yet */
 export const changeEmail = (body) => API_GATEWAY.patch('/user/email', body);
 
+/** Backend PhoneUpdateRequest: { phone } — null or empty clears the number */
+export const changePhone = (body) => API_GATEWAY.patch('/user/phone', body);
+
 export const searchpo = (query) => API_GATEWAY.post('/search', { query });
 
 export const addToFavorite = (payload) => API_GATEWAY.post('/saved', payload);

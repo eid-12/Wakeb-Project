@@ -35,6 +35,7 @@ public class AuthService {
                 .password(encoder.encode(req.password()))
                 .isUser(true)
                 .emailVerified(false)
+                .isActive(true)
                 .build();
         userRepo.save(user);
 

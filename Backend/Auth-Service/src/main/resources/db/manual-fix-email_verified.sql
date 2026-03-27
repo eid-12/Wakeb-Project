@@ -1,8 +1,5 @@
--- Optional cleanup: if you later add DEFAULT 0 on MySQL or drop this column, you can remove
--- `emailVerified` from the JPA `User` entity. Until then, the app sends email_verified = 0 on INSERT.
+-- Optional MySQL hardening for `users` (Auth-Service). The JPA entity sends values on INSERT;
+-- these ALTERs help if other tools insert rows without all columns.
 --
--- To drop the column after a DB default exists (optional):
--- ALTER TABLE users DROP COLUMN IF EXISTS email_verified;
---
--- To add a DB default so legacy clients are safe (optional):
 -- ALTER TABLE users MODIFY COLUMN email_verified TINYINT(1) NOT NULL DEFAULT 0;
+-- ALTER TABLE users MODIFY COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1;

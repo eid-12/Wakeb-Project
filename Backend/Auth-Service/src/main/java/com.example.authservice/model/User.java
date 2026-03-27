@@ -39,6 +39,13 @@ public class User implements UserDetails, Serializable {
     @Builder.Default
     private Boolean emailVerified = false;
 
+    /**
+     * Matches MySQL column {@code is_active} (NOT NULL in many schemas). New accounts are active.
+     */
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private Boolean isActive = true;
+
     @PrePersist
     void applySignupDefaults() {
         if (isUser == null) {
@@ -46,6 +53,9 @@ public class User implements UserDetails, Serializable {
         }
         if (emailVerified == null) {
             emailVerified = false;
+        }
+        if (isActive == null) {
+            isActive = true;
         }
     }
 
@@ -83,6 +93,6 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return Boolean.TRUE.equals(isActive);
     }
 }

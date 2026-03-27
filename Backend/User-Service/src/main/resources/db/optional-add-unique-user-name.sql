@@ -1,0 +1,3 @@
+-- Enforce unique display names (run AFTER resolving duplicate `name` values in USER).
+-- Example: keep one row per name, merge or delete extras, then:
+-- ALTER TABLE USER ADD CONSTRAINT UK_USER_NAME UNIQUE (name);

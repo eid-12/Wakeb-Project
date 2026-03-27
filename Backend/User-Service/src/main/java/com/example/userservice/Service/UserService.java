@@ -26,6 +26,13 @@ public class UserService {
 
     // Create a new user with default settings
     public void createUser(UserCreateRequest dto) {
+        if (repo.existsByName(dto.username())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already taken");
+        }
+        if (repo.existsById(dto.id())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User profile already exists for this account");
+        }
+
         User user = User.builder()
                 .id(dto.id())
                 .name(dto.username())
@@ -113,8 +120,9 @@ public class UserService {
         User u = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (repo.existsByName(username))
-            throw new RuntimeException("Username already taken");
+        if (!username.equals(u.getName()) && repo.existsByName(username)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already taken");
+        }
 
         u.setName(username);
     }

@@ -18,8 +18,8 @@ public class User {
     @Id
     private Integer id;
 
-    // User's name (required, max 50 characters)
-    @Column(nullable = false, length = 50)
+    // Display / login name — must be unique (matches auth username)
+    @Column(nullable = false, length = 50, unique = true)
     private String name;
 
     // User's email (optional, must be unique, max 100 characters)

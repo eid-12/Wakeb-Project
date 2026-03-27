@@ -97,23 +97,32 @@ public class AuthController {
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Map<String, String>> handleFeign(FeignException ex) {
         log.error("User-service error status={} body={}", ex.status(), ex.contentUTF8(), ex);
-        String message = switch (ex.status()) {
-            case 401, 403 ->
-                    "Registration could not finish (profile service rejected the request). Please try again later or contact support.";
-            case 404 ->
-                    "Registration service endpoint was not found. Please contact support.";
-            case 409 ->
-                    "This account already exists. Try signing in instead.";
-            default ->
-                    "We could not finish setting up your profile. Please try again in a few minutes.";
-        };
+        int st = ex.status();
+        String message;
+        if (st == 401 || st == 403) {
+            message = "Registration could not finish (profile service rejected the request). Please try again later or contact support.";
+        } else if (st == 404) {
+            message = "Registration service endpoint was not found. Please contact support.";
+        } else if (st == 409) {
+            message = "Username already taken";
+        } else {
+            message = "We could not finish setting up your profile. Please try again in a few minutes.";
+        }
+        if (st == 409) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", message));
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", message));
     }
 
     /** DB constraint / column issues — never expose SQL to clients. */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleDataIntegrity(DataIntegrityViolationException ex) {
-        log.warn("Data integrity violation: {}", ex.getMostSpecificCause().getMessage());
+        String cause = ex.getMostSpecificCause().getMessage();
+        log.warn("Data integrity violation: {}", cause);
+        if (cause != null && cause.toLowerCase().contains("duplicate entry")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Username already taken"));
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                 "message",
                 "We could not create your account. Please try again or pick a different username."));
@@ -132,7 +141,8 @@ public class AuthController {
 
         String raw = deepestMessage(ex);
         if ("User already exists".equals(raw)) {
-            return ResponseEntity.badRequest().body(Map.of("message", raw));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Username already taken"));
         }
         if (raw == null || looksLikeInfrastructureError(raw)) {
             log.error("Registration/auth error", ex);

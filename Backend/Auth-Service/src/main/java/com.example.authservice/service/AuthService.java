@@ -5,6 +5,7 @@ import com.example.authservice.dto.*;
 import com.example.authservice.model.User;
 import com.example.authservice.repository.UserRepository;
 import com.example.authservice.security.jwt.JwtService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,15 +40,18 @@ public class AuthService {
                 .build();
         userRepo.save(user);
 
-        // Inform the user-service via Feign client
-        userClient.createUser(
-                new UserCreateRequest(
-                        user.getId(),
-                        user.getUsername()
-                )
-        );
+        try {
+            userClient.createUser(
+                    new UserCreateRequest(
+                            user.getId(),
+                            user.getUsername()
+                    )
+            );
+        } catch (FeignException e) {
+            userRepo.deleteById(user.getId());
+            throw e;
+        }
 
-        // Return JWT token as AuthResponse
         return new AuthResponse(jwtService.generateToken(user));
     }
 

@@ -109,9 +109,13 @@ const resetForm = () => {
 };
 
 function apiErrorMessage(err, fallback) {
+  const status = err.response?.status;
   const d = err.response?.data;
   if (typeof d === 'string' && d.trim()) return d.trim();
   if (d && typeof d.message === 'string' && d.message.trim()) return d.message.trim();
+  if (status === 409) {
+    return 'Username already exists. Please choose a different username.';
+  }
   return fallback;
 }
 

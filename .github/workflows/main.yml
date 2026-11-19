@@ -37,7 +37,11 @@ jobs:
           context: ./client
           file: ./client/dockerfile.bak 
           push: true
-          tags: minipcer/mapping-frontend:latest
+          tags: |
+            minipcer/mapping-frontend:latest
+            minipcer/mapping-frontend:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
           build-args: |
             VUE_APP_API_GATEWAY_URL=/api
             VUE_APP_AUTH_API_URL=/api/auth

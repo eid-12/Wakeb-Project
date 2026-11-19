@@ -5,7 +5,8 @@
       <input
         class="search-input"
         type="text"
-        placeholder="Start your search..."
+        :placeholder="text.search"
+        :aria-label="text.search"
         v-model="searchQuery"
         @input="search"
         @focus="$emit('toggleSearchResults')"
@@ -29,7 +30,7 @@
               <p class="result-text">
                 {{ result.place_name || result.place_name_en || result.text }}
                 <span v-if="result.distance">
-                  – {{ result.distance.toFixed(1) }} km
+                  – {{ result.distance.toFixed(1) }} {{ text.km }}
                 </span>
               </p>
             </div>
@@ -56,8 +57,13 @@
     <!-- Geolocation Button -->
     <div
       class="geolocation-btn"
+      role="button"
+      tabindex="0"
+      :aria-label="text.locate"
       :class="{ 'geo-active': coords }"
       @click="$emit('getGeolocation')"
+      @keydown.enter="$emit('getGeolocation')"
+      @keydown.space.prevent="$emit('getGeolocation')"
     >
       <i
         class="fas fa-location-arrow geo-icon"
@@ -72,6 +78,7 @@
 
 import { ref, onUnmounted, computed } from "vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
+import { text, publicLanguage } from "@/public-site/locale";
 import { searchPlace , searchpo } from '@/api/user.js'; 
 
 const props = defineProps({
@@ -131,7 +138,7 @@ const search = () => {
 
 const data = await searchPlace(q, {
   fuzzyMatch: true,
-  language: "en",
+  language: publicLanguage,
   limit: 10,
   proximity: props.coords
     ? `${props.coords.lng},${props.coords.lat}`

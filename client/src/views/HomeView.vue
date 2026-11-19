@@ -2,12 +2,13 @@
 
 <div class="page-container" >
   <!-- Navbar -->  
-    <nav class="navbar" aria-label="Main">
+    <nav class="navbar" :aria-label="text.main">
       <div class="navbar-left">
-        <h1 class="logo">Wakeb Maps</h1>
+        <p class="logo">{{ text.brand }}</p>
       </div>
       <div class="navbar-right">
-        <span v-if="showNavbarSuccess" class="status-message">Success! ✓</span>
+        <a class="language-link" :href="otherLanguageURL" :lang="isArabic ? 'en' : 'ar'">{{ text.switchLanguage }}</a>
+        <span v-if="showNavbarSuccess" class="status-message">{{ text.success }}</span>
           
           <button v-if="isLoggedIn" type="button" class="user-flag" @click="selectedMenu = 'settings'">
           <i class="fa-solid fa-user" aria-hidden="true"></i>
@@ -15,10 +16,10 @@
           </button>
 
         <button id="Logout" v-if="isLoggedIn" type="button" class="logout-button" @click="logout">
-          <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
+          <i class="fas fa-sign-out-alt" aria-hidden="true"></i> {{ text.logout }}
         </button>
         <button v-else type="button" class="logout-button" @click="showLogin = true">
-          <i class="fas fa-user" aria-hidden="true"></i> Login
+          <i class="fas fa-user" aria-hidden="true"></i> {{ text.login }}
         </button>
       </div>
     </nav>
@@ -31,7 +32,7 @@
       <!-- Sliding login panel -->
   <LoginPanel
     v-if="showLogin"
-    class="login-panel"
+    class="login-panel" dir="ltr" lang="en"
     @close="showLogin = false"
     @success="handleLoginSuccess"
     ref="loginPanelRef"
@@ -40,23 +41,23 @@
       <!-- Sidebar (only when logged in) -->
       <div v-if="isLoggedIn" class="side-dashboard">
         <ul class="dashboard-menu">
-          <li :class="{ active: selectedMenu === 'map' }" @click="selectedMenu = 'map'">Map</li>
+          <li :class="{ active: selectedMenu === 'map' }" @click="selectedMenu = 'map'">{{ text.menu.map }}</li>
 
-          <li :class="{ active: selectedMenu === 'saved' }" @click="selectedMenu = 'saved'">Saved Places</li>
+          <li :class="{ active: selectedMenu === 'saved' }" @click="selectedMenu = 'saved'">{{ text.menu.saved }}</li>
 
-          <li :class="{ active: selectedMenu === 'history' }" @click="selectedMenu = 'history'">Search History</li>
+          <li :class="{ active: selectedMenu === 'history' }" @click="selectedMenu = 'history'">{{ text.menu.history }}</li>
 
-          <li :class="{ active: selectedMenu === 'add' }" @click="selectedMenu = 'add'">Add Unlisted Place</li>
+          <li :class="{ active: selectedMenu === 'add' }" @click="selectedMenu = 'add'">{{ text.menu.add }}</li>
 
-          <li :class="{ active: selectedMenu === 'settings' }" @click="selectedMenu = 'settings'">Settings</li>
-          <li v-show="isProfileAdmin(user)" :class="{ active: selectedMenu === 'admin' }" @click="selectedMenu = 'admin'">Administration</li>          
+          <li :class="{ active: selectedMenu === 'settings' }" @click="selectedMenu = 'settings'">{{ text.menu.settings }}</li>
+          <li v-show="isProfileAdmin(user)" :class="{ active: selectedMenu === 'admin' }" @click="selectedMenu = 'admin'">{{ text.menu.admin }}</li>
         </ul>
       </div>
 
       <!-- Main area -->
       <div class="map-and-overlay">
         <!-- Leaflet map -->
-        <div v-show="selectedMenu === 'map'" id="map" class="map" >
+        <div v-show="selectedMenu === 'map'" id="map" class="map" dir="ltr" >
           <div id="custom-layer-control" class="custom-layer-control"></div>
         </div>
 
@@ -113,6 +114,7 @@
  * Imports
  *************************/
 import { ref, onMounted, watch, nextTick } from 'vue';
+import { text, isArabic, otherLanguageURL } from '@/public-site/locale';
 import leaflet from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
@@ -643,6 +645,8 @@ btn.addEventListener('click', (evt) => {
   letter-spacing: -0.02em;
   margin: 0;
 }
+
+.language-link { color: inherit; padding: 0.35rem 0.5rem; font-size: 0.875rem; text-decoration: underline; white-space: nowrap; }
 
 .navbar-right {
   display: flex;

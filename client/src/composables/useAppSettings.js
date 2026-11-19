@@ -1,4 +1,5 @@
 import { reactive, watch } from 'vue';
+import { publicLanguage } from '@/public-site/locale';
 
 const STORAGE_KEY = 'wakeb.settings.v1';
 
@@ -36,16 +37,16 @@ export function hydrateUiFromStorage() {
   const root = document.documentElement;
   root.classList.toggle('dark', s.theme === 'Dark');
   root.style.fontSize = s.fontSize === 'Small' ? '14px' : '16px';
-  root.setAttribute('lang', 'en');
-  root.setAttribute('dir', 'ltr');
+  root.setAttribute('lang', publicLanguage);
+  root.setAttribute('dir', publicLanguage === 'ar' ? 'rtl' : 'ltr');
 }
 
 function applyFromReactive() {
   const root = document.documentElement;
   root.classList.toggle('dark', appSettings.theme === 'Dark');
   root.style.fontSize = appSettings.fontSize === 'Small' ? '14px' : '16px';
-  root.setAttribute('lang', 'en');
-  root.setAttribute('dir', 'ltr');
+  root.setAttribute('lang', publicLanguage);
+  root.setAttribute('dir', publicLanguage === 'ar' ? 'rtl' : 'ltr');
   persistAppSettings();
 }
 

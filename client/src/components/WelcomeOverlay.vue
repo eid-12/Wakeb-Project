@@ -1,40 +1,23 @@
-<!-- src/components/WelcomeOverlay.vue -->
 <template>
-  <div
-    class="welcome-overlay"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="welcome-title"
-    @keyup.esc="$emit('start')"
-    tabindex="0"
-  >
+  <div class="welcome-overlay" :class="{ 'copy-ar': isArabic }" role="dialog" aria-modal="true" aria-labelledby="welcome-title" @keyup.esc="$emit('start')" tabindex="0">
     <div class="welcome-card">
-      <h1 id="welcome-title">Welcome to Wakeb Maps</h1>
-
-      <p class="en lead">Begin your journey by searching ✨</p>
-      <p lang="ar" dir="rtl">&#1608;&#1575;&#1603;&#1576; &#1605;&#1575;&#1576;&#1586;: &#1575;&#1576;&#1581;&#1579; &#1593;&#1606; &#1575;&#1604;&#1571;&#1605;&#1575;&#1603;&#1606; &#1608;&#1575;&#1587;&#1578;&#1603;&#1588;&#1601; &#1575;&#1604;&#1582;&#1585;&#1610;&#1591;&#1577; &#1608;&#1575;&#1581;&#1601;&#1592; &#1571;&#1605;&#1575;&#1603;&#1606;&#1603; &#1575;&#1604;&#1605;&#1601;&#1590;&#1604;&#1577;.</p>
-
+      <h1 id="welcome-title">{{ text.heading }}</h1>
+      <a class="language-switch" :href="otherLanguageURL" :lang="isArabic ? 'en' : 'ar'">{{ text.switchLanguage }}</a>
+      <p class="en lead">{{ text.lead }}</p>
       <hr class="divider" />
-
-      <p class="en">
-        During my summer training at <strong>Wakeb Data</strong> in Riyadh, I worked on
-        <strong>Wakeb Maps</strong>, an interactive web mapping system that combines a Vue.js + Leaflet
-        front end with Spring Boot microservices to process data and expose REST APIs. We secured the
-        platform with JWT and Spring Security for role- and permission-based access. The stack was containerized with Docker for
-        easier deployment, and Postman was used to validate integration across services.
-      </p>
-
+      <p class="en">{{ text.description }}</p>
+      <ul class="public-features"><li v-for="item in text.features" :key="item">{{ item }}</li></ul>
+      <nav class="project-links" :aria-label="text.projects">
+        <a href="https://www.cloudbase.website/">{{ text.cloud }}</a>
+        <a :href="isArabic ? 'https://mawrid.cloudbase.website/ar/' : 'https://mawrid.cloudbase.website/'">{{ text.mawrid }}</a>
+      </nav>
     </div>
-
-    <button type="button" class="start-btn" @click="$emit('start')">
-      Get started
-    </button>
+    <button type="button" class="start-btn" @click="$emit('start')">{{ text.start }}</button>
   </div>
 </template>
-
 <script setup>
+import { text, isArabic, otherLanguageURL } from '@/public-site/locale';
 </script>
-
 <style scoped>
 .welcome-overlay {
   position: fixed;
@@ -172,4 +155,12 @@
     padding: 0.75rem 1.5rem;
   }
 }
+
+.copy-ar .en { direction: rtl; text-align: right; }
+.copy-ar h1 { font-family: Tahoma, Arial, sans-serif; line-height: 1.6; letter-spacing: normal; }
+.copy-ar .en.lead { text-align: center; }
+.language-switch { display: inline-block; margin-bottom: 1rem; color: #fff; text-decoration: underline; }
+.public-features { text-align: start; line-height: 1.8; padding-inline-start: 1.25rem; margin-block: 1rem; color: #f1f5f9; }
+.project-links { display: grid; gap: 0.5rem; margin-top: 1rem; text-align: start; }
+.project-links a { color: #d1fae5; text-decoration: underline; line-height: 1.7; }
 </style>

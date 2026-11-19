@@ -3,6 +3,7 @@ const path = require('path');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
+app.disable('x-powered-by');
 
 /**
  * Proxy targets (override per environment — Docker / Railway / local).
@@ -47,9 +48,16 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'dist'), {
+  setHeaders(res, file) {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    if (path.extname(file) === '.html') res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  }
+}));
 
 app.get('*', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 

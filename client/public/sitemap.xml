@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://maps.cloudbase.website/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://maps.cloudbase.website/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://maps.cloudbase.website/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://maps.cloudbase.website/ar/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://maps.cloudbase.website/" />
+  </url>
+  <url><loc>https://maps.cloudbase.website/ar/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://maps.cloudbase.website/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://maps.cloudbase.website/ar/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://maps.cloudbase.website/" />
+  </url>
 </urlset>

@@ -16,6 +16,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
+      - name: Build frontend for runtime checks
+        uses: docker/build-push-action@v4
+        with:
+          context: ./client
+          file: ./client/dockerfile.bak
+          push: false
+          load: true
+          tags: mapping-frontend:smoke
+          build-args: |
+            VUE_APP_API_GATEWAY_URL=/api
+            VUE_APP_AUTH_API_URL=/api/auth
+
+      - name: Check localized frontend runtime
+        run: bash client/scripts/smoke-locales.sh mapping-frontend:smoke
+
       - name: Build Frontend
         uses: docker/build-push-action@v4
         with:

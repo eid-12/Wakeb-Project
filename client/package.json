@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "dev:proxy": "node server.js",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && node scripts/localize-home.cjs",
     "lint": "vue-cli-service lint",
     "start": "node server.js"
   },

@@ -1,0 +1,35 @@
+name: Public map languages
+on:
+  push:
+    branches: [seo/maps-localized]
+  pull_request:
+    branches: [main]
+    paths: ['client/**', '.github/workflows/localized-home.yml']
+permissions:
+  contents: read
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Install and build both languages
+        working-directory: client
+        run: npm ci && npm run build
+      - uses: docker/build-push-action@v4
+        with:
+          context: client
+          file: client/dockerfile.bak
+          push: false
+          load: true
+          tags: mapping-frontend:locales
+          build-args: |
+            VUE_APP_API_GATEWAY_URL=/api
+            VUE_APP_AUTH_API_URL=/api/auth
+      - name: Check actual frontend runtime
+        run: bash client/scripts/smoke-locales.sh mapping-frontend:locales
